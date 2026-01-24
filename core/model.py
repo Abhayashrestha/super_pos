@@ -1,11 +1,12 @@
 class Product:
-    def __init__(self,product_id,name,price):
+    def __init__(self,product_id,name,price,quantity):
         self.product_id=product_id
         self.name=name
         self.price=float(price)
+        self.quantity=int(quantity)
 
     def __repr__(self):
-        return f"id={self.product_id},name={self.name},price={self.price}"
+        return f"id={self.product_id},name={self.name},price={self.price},quantity={self.quantity}"
 
 class LineItem:
     def __init__(self,product_instance,quantity):
@@ -14,7 +15,7 @@ class LineItem:
         self.price_sold_at=product_instance.price
 
     def get_total_price(self):
-        total_price=self.price_sold_at*(self.quantity)
+        total_price=self.price_sold_at*self.quantity
         return total_price
 
     def __repr__(self):
