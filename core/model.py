@@ -1,11 +1,11 @@
 class Product:
-    def __init__(self,id,name,price):
-        self.id=id
+    def __init__(self,product_id,name,price):
+        self.product_id=product_id
         self.name=name
         self.price=float(price)
 
     def __repr__(self):
-        return f"id={self.id},name={self.name},price={self.price}"
+        return f"id={self.product_id},name={self.name},price={self.price}"
 
 class LineItem:
     def __init__(self,product_instance,quantity):
