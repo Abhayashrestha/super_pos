@@ -1,8 +1,9 @@
-from .model import Product
+from .model import Product,Sale,LineItem
 
 class Catalog:
     def __init__(self):
         self.catalog={}
+        self.datetime=[]
 
     def add_product(self,product_instance):
         if product_instance.product_id not in self.catalog:
@@ -44,6 +45,21 @@ class Catalog:
             return 'Not Enough in stock'
         else:
             return 'Product not found'
+
+    def purchase_processing(self,product_id,requested_quantity):
+        in_stock=self.withdraw_stock(product_id,requested_quantity)
+        if in_stock=='Success':
+            target_product=self.catalog[product_id]
+            bill=LineItem(target_product,requested_quantity)
+
+
+        elif in_stock=='Not Enough in stock':
+            return 'Sorry we do not have that many product in stock'
+        else:
+            return 'Product not found'
+
+
+
 
 
 

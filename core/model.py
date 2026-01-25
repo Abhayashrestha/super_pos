@@ -1,3 +1,4 @@
+from datetime import datetime
 class Product:
     def __init__(self,product_id,name,price,quantity):
         self.product_id=product_id
@@ -25,6 +26,7 @@ class LineItem:
 class Sale:
     def __init__(self,sale_id):
         self.sale_id=sale_id
+        self.timestamp = datetime.now()
         self.items=[]
 
 
