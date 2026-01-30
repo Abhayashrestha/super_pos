@@ -1,8 +1,8 @@
 from .model import Product,Sale,LineItem
-
+from data import storage
 class Catalog:
     def __init__(self):
-        self.catalog={}
+        self.catalog=storage.get_connection()
         self.sales_history=[]
 
     def add_product(self,product_instance):

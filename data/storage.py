@@ -1,4 +1,4 @@
-
+from core.model import Product
 def get_connection():
     import psycopg2
     creds={"host":"localhost",
@@ -17,21 +17,45 @@ def get_connection():
 
 connect=get_connection()
 
-def db_add_product(connection,name,price,quantity,category):
+def db_add_product(connection,product):
     try:
         with connection.cursor() as cur:
             sql_query='INSERT INTO products (name,price,quantity,category) VALUES (%s,%s,%s,%s)'
-            insert_values= name,price,quantity,category
+            insert_values= product.name,product.price,product.quantity,product.category
             cur.execute(sql_query,insert_values)
             connection.commit()
-            print(f"Product:{name} has been added successfully")
+            print(f"Product:{product.name} has been added successfully")
     except Exception as e:
         connection.rollback()
         print(f"{e} error has occurred")
-    finally:
-        cur.close()
+        return None
+
 
 #db_add_product(connect,"Apple",10,100,"Fruit")
+
+def db_delete_product(connection,p_id):
+    try:
+        with connection.cursor as cur:
+            del_sql='DELETE FROM products where product_id=%s'
+            cur.execute(del_sql,(p_id,))
+            connection.commit()
+            print (f'Product:{p_id} has been deleted successfully')
+    except Exception as e:
+        connection.rollback()
+        print(f"{e}:Error has occurred")
+        return None
+
+def db_view_product(connection,p_id):
+    try:
+        with connection.cursor as cur:
+            display_sql='SELECT product_id,name,price,quantity,category FROM products where product_id=%s'
+            cur.execute(display_sql,(p_id,))
+            items=cur.fetchone()
+            if items:
+                return Product(items[0],items[1],items[2],items[3],items[4])
+    except Exception as e:
+        print(f"{e}:Error has occurred")
+        return None
 
 
 def db_view_all_product(connection):
@@ -46,10 +70,10 @@ def db_view_all_product(connection):
             return display
 
 
-
     except Exception as e:
         connection.rollback()
         print(f"{e} error has occurred")
+        return None
 
 #db_view_all_product(connect)
 
