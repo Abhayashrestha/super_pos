@@ -1,14 +1,14 @@
 from datetime import datetime
 class Product:
-    def __init__(self,product_id,name,price,quantity,category):
-        self.product_id=product_id.lower()
+    def __init__(self,name,price,quantity,category,p_id=None):
+        self.p_id=p_id
         self.name=name
         self.price=float(price)
         self.quantity=int(quantity)
         self.category=category
 
     def __repr__(self):
-        return f"id={self.product_id},name={self.name},price={self.price},quantity={self.quantity},category={self.category}"
+        return f"name={self.name},price={self.price},quantity={self.quantity},category={self.category}"
 
 class LineItem:
     def __init__(self,product_instance,quantity):
