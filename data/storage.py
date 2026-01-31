@@ -2,9 +2,9 @@ from core.model import Product
 def get_connection():
     import psycopg2
     creds={"host":"localhost",
-           "database":"",
+           "database":"posdb",
            "user":"postgres",
-           "password":""}
+           "password":"Shrestha#$1"}
 
     try:
         connection=psycopg2.connect(**creds)
@@ -15,7 +15,6 @@ def get_connection():
     except (Exception,psycopg2.Error) as error:
         print(f"{error} has occurred")
 
-connect=get_connection()
 
 def db_add_product(connection,product):
     try:
@@ -31,28 +30,28 @@ def db_add_product(connection,product):
         return None
 
 
-#db_add_product(connect,"Apple",10,100,"Fruit")
 
 def db_delete_product(connection,p_id):
     try:
-        with connection.cursor as cur:
+        with connection.cursor() as cur:
             del_sql='DELETE FROM products where product_id=%s'
             cur.execute(del_sql,(p_id,))
             connection.commit()
-            print (f'Product:{p_id} has been deleted successfully')
+            return f'Product:{p_id} has been deleted successfully'
     except Exception as e:
         connection.rollback()
-        print(f"{e}:Error has occurred")
-        return None
+        return f"{e}:Error has occurred"
+
 
 def db_view_product(connection,p_id):
     try:
-        with connection.cursor as cur:
+        with connection.cursor() as cur:
             display_sql='SELECT product_id,name,price,quantity,category FROM products where product_id=%s'
             cur.execute(display_sql,(p_id,))
             items=cur.fetchone()
             if items:
-                return Product(items[0],items[1],items[2],items[3],items[4])
+                return Product(items[1], items[2], items[3], items[4],items[0])
+
     except Exception as e:
         print(f"{e}:Error has occurred")
         return None
@@ -107,5 +106,5 @@ def sales_processing(connection,product_id,quantity,customer_name):
         print(f"{e} error has occurred")
         connection.rollback()
 
-c_name="bob"
-sales_processing(connect,3,10,c_name)
+
+
