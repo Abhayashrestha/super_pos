@@ -62,7 +62,8 @@ try:
         quantity_val=integer_validation(quantity,0,99)
         try:
             s=catalog.purchase_processing(v_id,quantity_val,user_name)
-            print(f'SaleID:{s}|customer{user_name}|Item{v_id}')
+            print(s)
+
         except ValueError:
             print("Purchase Unsuccessful")
         return None
