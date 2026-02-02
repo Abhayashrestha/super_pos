@@ -1,10 +1,10 @@
-from core.model import Product
+from core.model import Product,LineItem,Sale
 def get_connection():
     import psycopg2
     creds={"host":"localhost",
            "database":"posdb",
            "user":"postgres",
-           "password":"Shrestha#$1"}
+           "password":"#$1"}
 
     try:
         connection=psycopg2.connect(**creds)
@@ -15,7 +15,7 @@ def get_connection():
     except (Exception,psycopg2.Error) as error:
         print(f"{error} has occurred")
 
-
+#conn=get_connection()
 def db_add_product(connection,product):
     try:
         with connection.cursor() as cur:
@@ -79,16 +79,19 @@ def db_view_all_product(connection):
 def sales_processing(connection,product_id,quantity,customer_name):
     try:
         with connection.cursor() as cur:
-            check_sql='SELECT product_id,price,quantity from products WHERE product_id=%s'
+            check_sql='SELECT product_id,name,price,quantity,category from products WHERE product_id=%s'
             stock_reduce_sql='UPDATE products SET quantity=quantity-%s WHERE product_id=%s'
             sales_sql='INSERT INTO sales (customer_name) VALUES (%s) RETURNING sale_id'
             sale_item_sql='INSERT INTO sale_item (product_id,sale_id,quantity,current_price) VALUES (%s,%s,%s,%s) returning*'
             cur.execute(check_sql,(product_id,))
             result = cur.fetchone()
 
+
+
             if not result:
                 raise ValueError("Product Not Found")
-            p_id,current_price,current_quantity=result
+            p_id,product_name,current_price,current_quantity,product_category=result
+            product_instance = Product(product_name, current_price, current_quantity, product_category, product_id)
 
             if current_quantity>=quantity:
                 cur.execute(stock_reduce_sql,(quantity,product_id))
@@ -97,7 +100,11 @@ def sales_processing(connection,product_id,quantity,customer_name):
                 line_item=p_id,s_id,quantity,current_price
                 cur.execute(sale_item_sql,line_item)
                 connection.commit()
-                return s_id
+                new_line_item=LineItem(product_instance,quantity)
+                new_sale=Sale(s_id)
+                new_sale.add_item(new_line_item)
+                return new_sale
+
 
             else:
                 raise ValueError("Sorry! We do not have that many in stock")
@@ -105,6 +112,17 @@ def sales_processing(connection,product_id,quantity,customer_name):
     except Exception as e:
         print(f"{e} error has occurred")
         connection.rollback()
+
+def db_get_receipt(connection,sale_id):
+    try:
+        with connection.cursor() as cur:
+            sql='Select s.sale_id,p.name,si.quantity,si.Current_price,s.customer_name From sales s JOIN sale_item si on s.sale_id=si.sale_id LEFT JOIN products p on si.product_id=p.product_id WHERE s.sale_id=%s'
+            cur.execute(sql,(sale_id,))
+            out=cur.fetchone()
+            return out[0],out[1],out[2],out[3],out[4]
+
+    except:
+        raise ValueError("We could not find the sale")
 
 
 
