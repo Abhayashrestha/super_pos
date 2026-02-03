@@ -13,8 +13,8 @@ try:
         p_quantity_val = integer_validation(p_quantity, 0, 999)
         p_category = input("Please enter the category of product| ")
         product_instance=Product(p_name,p_price_val,p_quantity_val,p_category)
-        catalog.add_product(product_instance)
-        return f'{product_instance} has been added'
+        new_product=catalog.add_product(product_instance)
+        return new_product
 
 
     def delete_product(catalog):
@@ -31,11 +31,11 @@ try:
     def display_product(catalog):
         view=catalog.display_product()
         if view:
-            print(f"\n{'ID':<5} | {'Name':<15} | {'Price':<10} | {'Category':<15}")
-            print("-" * 50)
+            print(f"\n{'ID':<5} | {'Name':<15} | {'Price':<10} | {'Category':<9}| {'number':<5}")
+            print("-" * 55)
             for item in view:
-                print(f"{item['product_id']:<5} | {item['name']:<15} | ${item['price']:<9} | {item['category']:<15}")
-            print("-" * 50 + "\n")
+                print(f"{item['product_id']:<5} | {item['name']:<15} | ${item['price']:<9} | {item['category']:<9}| {item['quantity']:<5}")
+            print("-" * 55 + "\n")
         else:
             print("\n[!] The catalog is currently empty.\n")
 
@@ -61,11 +61,17 @@ try:
         user_name=input('Please enter your user name')
         quantity_val=integer_validation(quantity,0,99)
         try:
-            s=catalog.purchase_processing(v_id,quantity_val,user_name)
-            print(s)
+            sale_result=catalog.purchase_processing(v_id,quantity_val,user_name)
+            print(sale_result)
+            if sale_result:
+                receipt=input('press enter to print receipt| Anything else to exit')
+                if receipt=='':
+                    total_receipt=catalog.receipt_processing(sale_result)
+                    print(total_receipt)
 
-        except ValueError:
-            print("Purchase Unsuccessful")
+
+        except Exception as e:
+            print(f"{e}Purchase Unsuccessful")
         return None
 
 

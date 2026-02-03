@@ -6,7 +6,8 @@ class Catalog:
         self.connection=connection
 
     def add_product(self,product_instance):
-        storage.db_add_product(self.connection,product_instance)
+        new=storage.db_add_product(self.connection,product_instance)
+        return new
 
 
     def search_product(self,product_id):
@@ -26,8 +27,8 @@ class Catalog:
         s_id=storage.sales_processing(self.connection,product_id,requested_quantity,cus_name)
         return s_id
 
-    def receipt_processing(self,confirmation,s_id):
-        receipt=storage.db_get_receipt(s_id)
+    def receipt_processing(self,s_id):
+        receipt=storage.db_get_receipt(self.connection,s_id)
         return receipt
 
 
