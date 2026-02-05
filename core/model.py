@@ -25,11 +25,11 @@ class LineItem:
 
 
 class Sale:
-    def __init__(self,sale_id):
+    def __init__(self,sale_id,name=None,time=None):
         self.sale_id=sale_id
-        self.timestamp = datetime.now()
         self.items=[]
-        self.historical_receipt={}
+        self.name=name
+        self.time=time
 
 
     def add_item(self,item_to_add):
@@ -41,13 +41,11 @@ class Sale:
             total_sales+=item.get_total_price()
         return total_sales
 
-    def complete_receipt(self,receipt):
-        complete=self.historical_receipt[receipt[0]]={'productname':receipt[1],'quantity':receipt[2],'price':receipt[3],'cname':receipt[4],'time':receipt[5]}
-        return complete
-
-
     def __str__(self):
-        return f'{self.sale_id}'
+        header = f"--- RECEIPT #{self.sale_id} ---\nCustomer: {self.name}\nDate: {self.time}\n"
+        items_str = "\n".join([f"{item.product_instance.name:<15} x{item.quantity:<3} ${item.price_sold_at:>7.2f}" for item in self.items])
+        footer = f"\n--------------------------\nTOTAL: ${self.get_total_sales():>15.2f}"
+        return header + items_str + footer
 
 
 

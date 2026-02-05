@@ -14,7 +14,7 @@ def get_connection():
     except (Exception,psycopg2.Error) as error:
         print(f"{error} has occurred")
 
-#conn=get_connection()
+conn=get_connection()
 def db_add_product(connection,product):
     try:
         with connection.cursor() as cur:
@@ -116,21 +116,23 @@ def sales_processing(connection,product_id,quantity,customer_name):
 def db_get_receipt(connection,sale_id):
     try:
         with connection.cursor() as cur:
-            sql='Select s.sale_id,p.name,si.quantity,si.Current_price,s.customer_name,s.created_at,p.quantity,p.category,p.id From sales s JOIN sale_item si on s.sale_id=si.sale_id LEFT JOIN products p on si.product_id=p.product_id WHERE s.sale_id=%s'
+            sql='Select s.sale_id,p.name,si.quantity,si.Current_price,s.customer_name,s.created_at,p.quantity,p.category,p.product_id From sales s JOIN sale_item si on s.sale_id=si.sale_id LEFT JOIN products p on si.product_id=p.product_id WHERE s.sale_id=%s'
             cur.execute(sql,(sale_id,))
-            out=cur.fetchone()
-            s_id,product_name,quantity,price,name,time,p_quantity,category,p_id=out[0],out[1],out[2],out[3],out[4],out[5],out[6],out[7],out[8]
-            product_instance=Product(product_name,price,p_quantity,category,p_id)
-            new_line_item=LineItem(product_instance,quantity)
-            historical_receipt=s_id,product_name,quantity,price,name,time
-            new_receipt=Sale(s_id)
-            new_receipt.add_item(new_line_item)
-            new_receipt.complete_receipt(historical_receipt)
-            return new_receipt
+            out=cur.fetchall()
+            if out:
+                s_id=out[0][0]
+                name,time=out[0][4],out[0][5]
+                new_receipt = Sale(s_id,name,time)
+                for item in out:
+                    product_name,quantity,price,p_quantity,category,product_id=item[1],item[2],item[3],item[6],item[7],item[8]
+                    product_instance=Product(product_name,price,p_quantity,category,product_id)
+                    new_line_item=LineItem(product_instance,quantity)
+                    new_receipt.add_item(new_line_item)
+                print (new_receipt)
 
 
     except:
         raise ValueError("We could not find the sale")
 
 
-#db_get_receipt(conn,52)
+db_get_receipt(conn,52)

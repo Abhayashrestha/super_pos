@@ -1,5 +1,6 @@
 from .model import Product,Sale,LineItem
 from data import storage
+from services.services import ReceiptService
 
 class Catalog:
     def __init__(self,connection):
@@ -27,9 +28,18 @@ class Catalog:
         s_id=storage.sales_processing(self.connection,product_id,requested_quantity,cus_name)
         return s_id
 
-    def receipt_processing(self,s_id):
+    def receipt_processing(self, s_id):
         receipt=storage.db_get_receipt(self.connection,s_id)
         return receipt
+
+    def get_sale_receipt(self, s_id):
+        receipt_obj = storage.db_get_receipt(self.connection, s_id)
+        qr_string = ReceiptService.generate_qr(receipt_obj)
+
+        return {
+            "obj": receipt_obj,
+            "qr": qr_string
+        }
 
 
 
