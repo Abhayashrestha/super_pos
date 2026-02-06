@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>Sale Successful!</h2>
+    <p><strong>Receipt ID:</strong> {{ sale.sale_id }}</p>
+    <p><strong>Customer:</strong> {{ sale.name }}</p>
+    <p><strong>Date:</strong> {{ sale.time }}</p>
+    <hr>
+
+    <h3>Order Summary</h3>
+    <table style="width:100%; border-collapse: collapse;">
+        <thead>
+            <tr style="border-bottom: 1px solid #ccc;">
+                <th style="text-align:left;">Item</th>
+                <th>Qty</th>
+                <th style="text-align:right;">Price</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in sale.items %}
+            <tr>
+                <td>{{ item.product_instance.name }}</td>
+                <td style="text-align:center;">{{ item.quantity }}</td>
+                <td style="text-align:right;">${{ "%.2f"|format(item.price_sold_at) }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <p style="text-align:right; font-size: 1.2rem;">
+        <strong>Total: ${{ "%.2f"|format(sale.get_total_sales()) }}</strong>
+    </p>
+
+    <div class="qr-box">
+        <h4>Digital Receipt QR</h4>
+        <img src="data:image/png;base64, {{ qr }}" alt="QR Code">
+        <p><small>Scan to verify this transaction.</small></p>
+    </div>
+
+    <a href="/" class="btn">Return to Store</a>
+{% endblock %}
