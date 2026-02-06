@@ -14,7 +14,7 @@ def get_connection():
     except (Exception,psycopg2.Error) as error:
         print(f"{error} has occurred")
 
-conn=get_connection()
+
 def db_add_product(connection,product):
     try:
         with connection.cursor() as cur:
@@ -128,11 +128,11 @@ def db_get_receipt(connection,sale_id):
                     product_instance=Product(product_name,price,p_quantity,category,product_id)
                     new_line_item=LineItem(product_instance,quantity)
                     new_receipt.add_item(new_line_item)
-                print (new_receipt)
+                return new_receipt
 
 
     except:
         raise ValueError("We could not find the sale")
 
 
-db_get_receipt(conn,52)
+

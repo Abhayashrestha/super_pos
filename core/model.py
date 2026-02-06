@@ -1,4 +1,3 @@
-from datetime import datetime
 class Product:
     def __init__(self,name,price,quantity,category,p_id=None):
         self.p_id=p_id
