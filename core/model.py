@@ -1,10 +1,11 @@
 class Product:
-    def __init__(self,name,price,quantity,category,p_id=None):
+    def __init__(self,name,price,quantity,category,image_path='default.jpg',p_id=None):
         self.p_id=p_id
         self.name=name
         self.price=float(price)
         self.quantity=int(quantity)
         self.category=category
+        self.image_path=image_path
 
     def __str__(self):
         return f"name={self.name},\n price={self.price} \n,quantity={self.quantity},\ncategory={self.category}\n has been added"

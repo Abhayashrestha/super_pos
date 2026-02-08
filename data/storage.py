@@ -4,7 +4,7 @@ def get_connection():
     creds={"host":"localhost",
            "database":"posdb",
            "user":"postgres",
-           "password":"#$1"}
+           "password":"Shrestha#$1"}
 
     try:
         connection=psycopg2.connect(**creds)
@@ -18,8 +18,14 @@ def get_connection():
 def db_add_product(connection,product):
     try:
         with connection.cursor() as cur:
-            sql_query='INSERT INTO products (name,price,quantity,category) VALUES (%s,%s,%s,%s)'
-            insert_values= product.name,product.price,product.quantity,product.category
+            sql_query='''
+            INSERT INTO products (name,price,quantity,category,image_path) 
+            VALUES (%s,%s,%s,%s,%s) 
+            ON CONFLICT (name) DO UPDATE 
+            SET quantity = products.quantity + EXCLUDED.quantity,
+            price = EXCLUDED.price,
+            image_path = EXCLUDED.image_path;'''
+            insert_values= product.name,product.price,product.quantity,product.category,product.image_path
             cur.execute(sql_query,insert_values)
             connection.commit()
             print(f"Product:{product.name} has been added successfully")
