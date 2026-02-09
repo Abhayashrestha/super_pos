@@ -44,9 +44,10 @@ def add_product():
 
     return render_template('add_product.html')
 
-
-
-
+@app.route('/')
+def storefront():
+    inventory=engine.display_product()
+    return render_template('storefront.html',products=inventory)
 
 
 

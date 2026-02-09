@@ -4,7 +4,7 @@ def get_connection():
     creds={"host":"localhost",
            "database":"posdb",
            "user":"postgres",
-           "password":"Shrestha#$1"}
+           "password":"#$1"}
 
     try:
         connection=psycopg2.connect(**creds)
@@ -51,11 +51,11 @@ def db_delete_product(connection,p_id):
 def db_view_product(connection,p_id):
     try:
         with connection.cursor() as cur:
-            display_sql='SELECT product_id,name,price,quantity,category FROM products where product_id=%s'
+            display_sql='SELECT product_id,name,price,quantity,category,image_path FROM products where product_id=%s'
             cur.execute(display_sql,(p_id,))
             items=cur.fetchone()
             if items:
-                return Product(items[1], items[2], items[3], items[4],items[0])
+                return Product(items[1], items[2], items[3], items[4],items[5],items[0])
 
     except Exception as e:
         print(f"{e}:Error has occurred")
@@ -63,21 +63,26 @@ def db_view_product(connection,p_id):
 
 
 def db_view_all_product(connection):
+    display = []
     try:
         with connection.cursor() as cur:
-            display=[]
-            query="SELECT* FROM products"
+            query = """
+                SELECT product_id, name, price, quantity, category, image_path 
+                FROM products
+            """
             cur.execute(query)
-            key= [column[0] for column in cur.description]
-            for row in cur.fetchall():
-                display.append(dict(zip(key,row)))
-            return display
 
+            key = [column[0] for column in cur.description]
+
+            for row in cur.fetchall():
+                item_dict = dict(zip(key, row))
+                display.append(item_dict)
 
     except Exception as e:
-        connection.rollback()
-        print(f"{e} error has occurred")
-        return None
+        print(f"Database Error: {e}")
+
+    return display
+
 
 #db_view_all_product(connect)
 
