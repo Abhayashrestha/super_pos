@@ -1,41 +1,71 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h2>Sale Successful!</h2>
-    <p><strong>Receipt ID:</strong> {{ sale.sale_id }}</p>
-    <p><strong>Customer:</strong> {{ sale.name }}</p>
-    <p><strong>Date:</strong> {{ sale.time }}</p>
-    <hr>
+<div class="container py-5">
+    <div class="card shadow-lg border-0 mx-auto" style="max-width: 600px; border-radius: 15px;">
+        <div class="card-body p-5">
+            <div class="text-center mb-4">
+                <div class="display-6 fw-bold text-success">Sale Successful!</div>
+                <p class="text-muted">Thank you for your purchase</p>
+            </div>
 
-    <h3>Order Summary</h3>
-    <table style="width:100%; border-collapse: collapse;">
-        <thead>
-            <tr style="border-bottom: 1px solid #ccc;">
-                <th style="text-align:left;">Item</th>
-                <th>Qty</th>
-                <th style="text-align:right;">Price</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for item in sale.items %}
-            <tr>
-                <td>{{ item.product_instance.name }}</td>
-                <td style="text-align:center;">{{ item.quantity }}</td>
-                <td style="text-align:right;">${{ "%.2f"|format(item.price_sold_at) }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+            <div class="row mb-4">
+                <div class="col-6">
+                    <small class="text-uppercase text-muted fw-bold">Receipt ID</small>
+                    <p class="fw-medium">#{{ sale.sale_id }}</p>
+                </div>
+                <div class="col-6 text-end">
+                    <small class="text-uppercase text-muted fw-bold">Date</small>
+                    <p class="fw-medium">{{ sale.time }}</p>
+                </div>
+                <div class="col-12">
+                    <small class="text-uppercase text-muted fw-bold">Customer</small>
+                    <p class="fw-medium">{{ sale.name }}</p>
+                </div>
+            </div>
 
-    <p style="text-align:right; font-size: 1.2rem;">
-        <strong>Total: ${{ "%.2f"|format(sale.get_total_sales()) }}</strong>
-    </p>
+            <hr class="my-4">
 
-    <div class="qr-box">
-        <h4>Digital Receipt QR</h4>
-        <img src="data:image/png;base64, {{ qr }}" alt="QR Code">
-        <p><small>Scan to verify this transaction.</small></p>
+            <h5 class="fw-bold mb-3">Order Summary</h5>
+            <div class="table-responsive">
+                <table class="table table-borderless">
+                    <thead>
+                        <tr class="border-bottom">
+                            <th class="ps-0 text-muted">Item</th>
+                            <th class="text-center text-muted">Qty</th>
+                            <th class="text-end text-muted">Price</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in sale.items %}
+                        <tr>
+                            <td class="ps-0 fw-bold">{{ item.product_instance.name }}</td>
+                            <td class="text-center">{{ item.quantity }}</td>
+                            <td class="text-end">${{ "%.2f"|format(item.price_sold_at) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mt-4 p-3 bg-light rounded">
+                <span class="h5 mb-0 fw-bold">Total Amount</span>
+                <span class="h4 mb-0 fw-bold text-success">${{ "%.2f"|format(sale.get_total_sales()) }}</span>
+            </div>
+
+            <div class="text-center mt-5">
+                <h6 class="text-uppercase text-muted fw-bold mb-3">Digital Verification</h6>
+                <div class="p-3 d-inline-block border rounded bg-white shadow-sm">
+                    <img src="data:image/png;base64, {{ qr }}" alt="QR Code" style="width: 150px; height: 150px;">
+                </div>
+                <p class="mt-2"><small class="text-muted">Scan this QR to verify this transaction on our blockchain ledger.</small></p>
+            </div>
+
+            <div class="mt-5 d-grid gap-2">
+                <a href="/" class="btn btn-dark btn-lg shadow-sm" style="border-radius: 10px;">Return to Storefront</a>
+                <button onclick="window.print()" class="btn btn-link text-decoration-none text-muted">Print Receipt</button>
+            </div>
+        </div>
     </div>
-
-    <a href="/" class="btn">Return to Store</a>
+</div>
 {% endblock %}
