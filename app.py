@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, request, redirect, flash
+from flask import Flask, render_template, request, redirect, flash, url_for
 from werkzeug.utils import secure_filename
 from data.storage import get_connection, db_add_product # Added your DB function
 from core.engine import Catalog, Product
@@ -49,6 +49,29 @@ def storefront():
     inventory=engine.display_product()
     return render_template('storefront.html',products=inventory)
 
+
+@app.route('/buy/<int:p_id>',methods=['GET','POST'])
+def buy_product(p_id):
+    cus_name = 'guest'
+    if request.method=="POST":
+        quantity=request.form.get("quantity")
+        try:
+            qty=int(quantity)
+            sale=engine.purchase_processing(p_id,qty,cus_name)
+            if sale:
+                flash(f"Success! Order #{sale} placed.", "success")
+                return redirect(url_for('show_receipt', s_id=sale))
+            else:
+                flash('Transaction failed. Please try again.')
+
+        except ValueError as e:
+            flash(str(e), "warning")
+
+        except Exception as e:
+            flash("A system error occurred.", "danger")
+            print(f"Error: {e}")
+
+    return redirect(url_for('show_receipt'))
 
 
 

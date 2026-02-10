@@ -4,7 +4,7 @@ def get_connection():
     creds={"host":"localhost",
            "database":"posdb",
            "user":"postgres",
-           "password":"#$1"}
+           "password":"Shrestha#$1"}
 
     try:
         connection=psycopg2.connect(**creds)
@@ -90,13 +90,11 @@ def sales_processing(connection,product_id,quantity,customer_name):
     try:
         with connection.cursor() as cur:
             check_sql='SELECT product_id,name,price,quantity,category from products WHERE product_id=%s'
-            stock_reduce_sql='UPDATE products SET quantity=quantity-%s WHERE product_id=%s'
+            stock_reduce_sql='UPDATE products SET quantity=quantity-%s WHERE product_id=%s and quantity>=%s'
             sales_sql='INSERT INTO sales (customer_name) VALUES (%s) RETURNING sale_id'
             sale_item_sql='INSERT INTO sale_item (product_id,sale_id,quantity,current_price) VALUES (%s,%s,%s,%s) returning*'
             cur.execute(check_sql,(product_id,))
             result = cur.fetchone()
-
-
 
             if not result:
                 raise ValueError("Product Not Found")
@@ -104,7 +102,7 @@ def sales_processing(connection,product_id,quantity,customer_name):
             product_instance = Product(product_name, current_price, current_quantity, product_category, product_id)
 
             if current_quantity>=quantity:
-                cur.execute(stock_reduce_sql,(quantity,product_id))
+                cur.execute(stock_reduce_sql,(quantity,product_id,current_quantity))
                 cur.execute(sales_sql,(customer_name,))
                 s_id=cur.fetchone()[0]
                 line_item=p_id,s_id,quantity,current_price
