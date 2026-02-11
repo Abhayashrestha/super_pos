@@ -42,10 +42,11 @@ def db_delete_product(connection,p_id):
             del_sql='DELETE FROM products where product_id=%s'
             cur.execute(del_sql,(p_id,))
             connection.commit()
-            return f'Product:{p_id} has been deleted successfully'
+            return True
     except Exception as e:
+        print(f"{e}:Error has occurred")
         connection.rollback()
-        return f"{e}:Error has occurred"
+        return False
 
 
 def db_view_product(connection,p_id):
@@ -120,6 +121,19 @@ def sales_processing(connection,product_id,quantity,customer_name):
     except Exception as e:
         print(f"{e} error has occurred")
         connection.rollback()
+
+def db_modify_stock(connection,p_id,quantity):
+    try:
+        with connection.cursor() as cur:
+            sql="UPDATE products SET quantity = %s WHERE product_id = %s"
+            cur.execute(sql,(quantity,p_id))
+            connection.commit()
+            return True
+
+    except Exception as e:
+        print(f"SQL Error: {e}")
+        connection.rollback()
+        return False
 
 
 def db_get_receipt(connection,sale_id):

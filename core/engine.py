@@ -32,6 +32,10 @@ class Catalog:
         receipt=storage.db_get_receipt(self.connection,s_id)
         return receipt
 
+    def stock_management(self,p_id,quantity):
+        new_stock=storage.db_modify_stock(self,p_id,quantity)
+        return new_stock
+
     def get_sale_receipt(self, s_id):
         receipt_obj = storage.db_get_receipt(self.connection, s_id)
         qr_string = ReceiptService.generate_qr(receipt_obj)

@@ -1,7 +1,7 @@
 import os
 from flask import Flask, render_template, request, redirect, flash, url_for
 from werkzeug.utils import secure_filename
-from data.storage import get_connection, db_add_product # Added your DB function
+from data.storage import get_connection
 from core.engine import Catalog, Product
 
 
@@ -23,12 +23,14 @@ def show_receipt(s_id):
         qr=data_bundle['qr']
     )
 
-@app.route("/add-product",methods=['GET','POST'])
+@app.route("/add-product",methods=['POST'])
 def add_product():
     if request.method=='POST':
         p_name=request.form.get("p_name")
         p_price=request.form.get("p_price")
+        price=float(p_price)
         p_qty=request.form.get('p_qty')
+        quantity=int(p_qty)
         p_category=request.form.get("p_category")
         p_image=request.files.get('p_image')
         if p_image and p_image.filename != '':
@@ -36,13 +38,11 @@ def add_product():
             p_image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
         else:
             filename = 'default.jpg'
-        product=Product(p_name,p_price,p_qty,p_category,filename)
+        product=Product(p_name,price,quantity,p_category,filename)
         engine.add_product(product)
 
         flash("Product added to inventory!", "success")
-        return redirect('/')
-
-    return render_template('add_product.html')
+        return redirect(url_for('admin'))
 
 @app.route('/')
 def storefront():
@@ -72,6 +72,63 @@ def buy_product(p_id):
             print(f"Error: {e}")
 
     return redirect(url_for('show_receipt'))
+
+@app.route('/admin',methods=['GET','POST'])
+def admin():
+    inventory=engine.display_product()
+    return render_template('admin.html',products=inventory)
+
+
+
+@app.route('/delete-product/<int:p_id>',methods=['POST'])
+def delete_product(p_id):
+    try:
+        success = engine.delete_product(p_id)
+        if success:
+            flash("Product deleted successfully.", "success")
+        else:
+            flash("Could not delete. Check if product is linked to sales.", "danger")
+    except Exception as e:
+        flash(f"Error: {str(e)}", "danger")
+
+    return redirect(url_for('admin'))
+
+@app.route('/update-stock/<int:p_id>',methods=['POST'])
+def update_stock(p_id):
+    try:
+        if request.method=='POST':
+            quantity=request.form.get('new_qty')
+            qty=int(quantity)
+            engine.stock_management(p_id,qty)
+            flash("Stock updated successfully.",'success')
+        else:
+            flash("could not update stock",'Failed')
+    except Exception as e:
+        flash(f"Error: {str(e)}", "danger")
+
+    return redirect(url_for('admin'))
+
+
+@app.route('/lookup-receipt', methods=['POST'])  # Remove the <int:s_id>
+def lookup_receipt():  # Remove s_id from the arguments
+    try:
+        sale_id = request.form.get('s_id')
+        if not sale_id:
+            flash("No ID entered", "warning")
+            return redirect(url_for('admin'))
+        clean_id = int(sale_id)
+        return redirect(url_for('show_receipt', s_id=clean_id))
+
+    except ValueError:
+        flash("Invalid Receipt ID. Numbers only.", "danger")
+    except Exception as e:
+        flash(f"System Error: {str(e)}", "danger")
+
+    return redirect(url_for('admin'))
+
+
+
+
 
 
 
