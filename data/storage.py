@@ -4,7 +4,7 @@ def get_connection():
     creds={"host":"localhost",
            "database":"posdb",
            "user":"postgres",
-           "password":"#$1"}
+           "password":"Shrestha#$1"}
 
     try:
         connection=psycopg2.connect(**creds)
