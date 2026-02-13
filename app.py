@@ -44,6 +44,7 @@ def add_product():
         flash("Product added to inventory!", "success")
         return redirect(url_for('admin'))
 
+
 @app.route('/')
 def storefront():
     inventory=engine.display_product()
@@ -99,7 +100,7 @@ def update_stock(p_id):
         if request.method=='POST':
             quantity=request.form.get('new_qty')
             qty=int(quantity)
-            engine.stock_management(p_id,qty)
+            new_stock=engine.stock_management(p_id,qty)
             flash("Stock updated successfully.",'success')
         else:
             flash("could not update stock",'Failed')

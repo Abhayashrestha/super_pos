@@ -33,7 +33,7 @@ class Catalog:
         return receipt
 
     def stock_management(self,p_id,quantity):
-        new_stock=storage.db_modify_stock(self,p_id,quantity)
+        new_stock=storage.db_modify_stock(self.connection,p_id,quantity)
         return new_stock
 
     def get_sale_receipt(self, s_id):
