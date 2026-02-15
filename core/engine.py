@@ -45,8 +45,9 @@ class Catalog:
             "qr": qr_string
         }
 
-
-
+    def display_sales(self):
+        out = storage.db_get_all_sales(self.connection)
+        return out
 
 
 

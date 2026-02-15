@@ -158,4 +158,28 @@ def db_get_receipt(connection,sale_id):
         raise ValueError("We could not find the sale")
 
 
+def db_get_all_sales(connection):
+    display = []
+    try:
+        with connection.cursor() as cur:
+            query = """
+                    select s.sale_id,p.name,p.quantity,si.current_price
+                    From products p
+                    join sale_item si on p.product_id=si.product_id
+                    left join sales s on si.sale_id=s.sale_id
+                """
+            cur.execute(query)
+
+            key = [column[0] for column in cur.description]
+
+            for row in cur.fetchall():
+                item_dict = dict(zip(key, row))
+                display.append(item_dict)
+
+    except Exception as e:
+        print(f"Database Error: {e}")
+
+    return display
+
+
 
