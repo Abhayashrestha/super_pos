@@ -24,8 +24,8 @@ class Catalog:
         delete=storage.db_delete_product(self.connection,product_id)
         return delete
 
-    def purchase_processing(self, product_id, requested_quantity,cus_name):
-        s_id=storage.sales_processing(self.connection,product_id,requested_quantity,cus_name)
+    def purchase_processing(self,basket,cus_name):
+        s_id=storage.sales_processing(self.connection,basket,cus_name)
         return s_id
 
     def receipt_processing(self, s_id):
