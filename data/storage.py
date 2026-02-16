@@ -4,7 +4,7 @@ def get_connection():
     creds={"host":"localhost",
            "database":"posdb",
            "user":"postgres",
-           "password":"Shrestha#$1"}
+           "password":"#$1"}
 
     try:
         connection=psycopg2.connect(**creds)
@@ -87,36 +87,36 @@ def db_view_all_product(connection):
 
 #db_view_all_product(connect)
 
-def sales_processing(connection,product_id,quantity,customer_name):
+def sales_processing(connection,basket,customer_name):
     try:
         with connection.cursor() as cur:
             check_sql='SELECT product_id,name,price,quantity,category from products WHERE product_id=%s'
             stock_reduce_sql='UPDATE products SET quantity=quantity-%s WHERE product_id=%s and quantity>=%s'
             sales_sql='INSERT INTO sales (customer_name) VALUES (%s) RETURNING sale_id'
             sale_item_sql='INSERT INTO sale_item (product_id,sale_id,quantity,current_price) VALUES (%s,%s,%s,%s) returning*'
-            cur.execute(check_sql,(product_id,))
-            result = cur.fetchone()
+            cur.execute(sales_sql, (customer_name,))
+            s_id = cur.fetchone()[0]
+            new_sale = Sale(s_id)
+            for product_id,quantity in basket.items():
+                cur.execute(check_sql,(product_id,))
+                result = cur.fetchone()
 
-            if not result:
-                raise ValueError("Product Not Found")
-            p_id,product_name,current_price,current_quantity,product_category=result
-            product_instance = Product(product_name, current_price, current_quantity, product_category, product_id)
+                if not result:
+                    raise ValueError("Product Not Found")
+                p_id,product_name,current_price,current_quantity,product_category=result
+                product_instance = Product(product_name, current_price, current_quantity, product_category, product_id)
 
-            if current_quantity>=quantity:
-                cur.execute(stock_reduce_sql,(quantity,product_id,current_quantity))
-                cur.execute(sales_sql,(customer_name,))
-                s_id=cur.fetchone()[0]
-                line_item=p_id,s_id,quantity,current_price
-                cur.execute(sale_item_sql,line_item)
-                connection.commit()
-                new_line_item=LineItem(product_instance,quantity)
-                new_sale=Sale(s_id)
-                new_sale.add_item(new_line_item)
-                return s_id
+                if current_quantity>=quantity:
+                    cur.execute(stock_reduce_sql,(quantity,product_id,current_quantity))
+                    line_item=p_id,s_id,quantity,current_price
+                    cur.execute(sale_item_sql,line_item)
+                    new_line_item=LineItem(product_instance,quantity)
+                    new_sale.add_item(new_line_item)
+                else:
+                    raise ValueError("Sorry! We do not have that many in stock")
 
-
-            else:
-                raise ValueError("Sorry! We do not have that many in stock")
+            connection.commit()
+            return s_id
 
     except Exception as e:
         print(f"{e} error has occurred")
@@ -163,13 +163,12 @@ def db_get_all_sales(connection):
     try:
         with connection.cursor() as cur:
             query = """
-                    select s.sale_id,p.name,p.quantity,si.current_price
-                    From products p
-                    join sale_item si on p.product_id=si.product_id
-                    left join sales s on si.sale_id=s.sale_id
+                    select s.sale_id,s.created_at,count(si.sale_id) as total_sales,sum(si.quantity*si.current_price)as total_revenue
+                    from sales s
+                    join sale_item si on s.sale_id=si.sale_id
+                    group by s.sale_id,s.created_at
                 """
             cur.execute(query)
-
             key = [column[0] for column in cur.description]
 
             for row in cur.fetchall():

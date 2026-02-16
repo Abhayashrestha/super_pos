@@ -1,58 +1,70 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container py-4">
-    <div class="card shadow-lg border-0 mx-auto" style="max-width: 550px; border-radius: 20px;">
-        <div class="card-body p-5">
-            <div class="text-center mb-4">
-                <div class="h2 fw-bold text-success">Transaction Verified</div>
-                <p class="text-muted small text-uppercase tracking-widest">Official Receipt</p>
-            </div>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card border-0 shadow-lg" style="border-radius: 25px; overflow: hidden;">
 
-            <div class="row mb-4 bg-light p-3 rounded-3 mx-1">
-                <div class="col-6">
-                    <small class="text-muted d-block text-uppercase">Order ID</small>
-                    <span class="fw-bold">#{{ sale.sale_id }}</span>
+                <div class="bg-success py-4 text-center text-white">
+                    <i class="bi bi-check-circle-fill display-4"></i>
+                    <h2 class="fw-bold mt-2">Payment Successful</h2>
+                    <p class="mb-0 opacity-75">Thank you for shopping at Abayas Store</p>
                 </div>
-                <div class="col-6 text-end">
-                    <small class="text-muted d-block text-uppercase">Customer</small>
-                    <span class="fw-bold">{{ sale.name }}</span>
+
+                <div class="card-body p-4 p-md-5">
+                    <div class="d-flex justify-content-between mb-4 border-bottom pb-3">
+                        <div>
+                            <div class="text-muted small text-uppercase fw-bold">Order ID</div>
+                            <div class="h5 fw-bold text-dark">#{{ sale.sale_id }}</div>
+                        </div>
+                        <div class="text-end">
+                            <div class="text-muted small text-uppercase fw-bold">Customer</div>
+                            <div class="h5 fw-bold text-dark">{{ sale.name }}</div>
+                        </div>
+                    </div>
+
+                    <table class="table table-borderless align-middle mb-4">
+                        <thead class="text-muted small text-uppercase">
+                            <tr>
+                                <th>Item</th>
+                                <th class="text-center">Qty</th>
+                                <th class="text-end">Price</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in sale.items %}
+                            <tr>
+                                <td class="fw-bold">{{ item.product_instance.name }}</td>
+                                <td class="text-center">{{ item.quantity }}</td>
+                                <td class="text-end">${{ "%.2f"|format(item.price_sold_at) }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+
+                    <div class="bg-light p-4 rounded-3 mb-4">
+                        <div class="d-flex justify-content-between mb-4">
+                            <span class="h5 fw-bold mb-0">Total</span>
+                            <span class="h5 fw-bold mb-0 text-primary">${{ "%.2f"|format(sale.get_total_sales()) }}</span>
+                        </div>
+                    </div>
+
+                    <div class="text-center">
+                        <div class="mb-4">
+                            <img src="data:image/png;base64,{{ qr }}" alt="Order QR" class="img-fluid" style="max-width: 150px;">
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button onclick="window.print()" class="btn btn-outline-dark fw-bold">
+                                <i class="bi bi-printer me-2"></i> Print Receipt
+                            </button>
+                            <a href="{{ url_for('storefront') }}" class="btn btn-dark fw-bold">
+                                Back to Store
+                            </a>
+                        </div>
+                    </div>
                 </div>
-            </div>
-
-            <table class="table table-borderless">
-                <thead>
-                    <tr class="border-bottom">
-                        <th class="ps-0 text-muted small">ITEM</th>
-                        <th class="text-center text-muted small">QTY</th>
-                        <th class="text-end text-muted small">PRICE</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in sale.items %}
-                    <tr>
-                        <td class="ps-0 fw-bold">{{ item.product_instance.name }}</td>
-                        <td class="text-center">{{ item.quantity }}</td>
-                        <td class="text-end fw-bold">${{ "%.2f"|format(item.price_sold_at) }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-
-            <div class="d-flex justify-content-between align-items-center mt-4 p-4 border-top">
-                <span class="h5 mb-0 fw-bold">TOTAL PAID</span>
-                <span class="h3 mb-0 fw-bold text-primary">${{ "%.2f"|format(sale.get_total_sales()) }}</span>
-            </div>
-
-            <div class="text-center mt-5">
-                <div class="p-3 d-inline-block border rounded bg-white shadow-sm mb-3">
-                    <img src="data:image/png;base64, {{ qr }}" alt="QR Code" style="width: 160px; height: 160px;">
-                </div>
-                <p class="text-muted small">Scan this code to verify the authenticity of your purchase at Abayas Store.</p>
-            </div>
-
-            <div class="mt-4 d-grid gap-2">
-                <a href="/" class="btn btn-outline-dark fw-bold py-2">Return to Shopping</a>
             </div>
         </div>
     </div>
