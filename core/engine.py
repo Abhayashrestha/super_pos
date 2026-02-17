@@ -50,6 +50,17 @@ class Catalog:
         return out
 
 
+    def dashboard_data(self):
+        dash=storage.get_dashboard_data(self.connection)
+        if dash['out_of_stock']==0:
+            status='healthy'
+        elif dash['out_of_stock'] <= 5:
+            status='warning'
+        else:
+            status='critical'
+
+
+
 
 
 
