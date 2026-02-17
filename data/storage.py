@@ -14,7 +14,7 @@ def get_connection():
     except (Exception,psycopg2.Error) as error:
         print(f"{error} has occurred")
 
-
+connect=get_connection()
 def db_add_product(connection,product):
     try:
         with connection.cursor() as cur:
@@ -179,6 +179,56 @@ def db_get_all_sales(connection):
         print(f"Database Error: {e}")
 
     return display
+
+def get_dashboard_data(connection):
+    with connection.cursor() as cur:
+        total_revenue_query="""
+                            select sum(current_price*quantity) as Total
+                            from sale_item
+                            """
+        best_customer_query="""
+                        select s.customer_name,sum(si.current_price*si.quantity) as total
+                        from sales s
+                        join sale_item si on s.sale_id=si.sale_id
+                        group by s.customer_name
+                        order by total desc
+                        limit 1
+                        """
+        empty_inventory_query="""
+                                select count(quantity) as items_out_of_stock
+                                from products
+                                where quantity=0
+                            """
+
+        total_rev = 0
+        best_name = "N/A"
+        best_spend = 0
+        oos_count = 0
+
+
+        cur.execute(total_revenue_query)
+        row = cur.fetchone()
+        if row and row[0] is not None:
+            total_rev = row[0]
+
+        cur.execute(best_customer_query)
+        row = cur.fetchone()
+        if row:
+            best_name = row[0]
+            best_spend = row[1]
+
+        cur.execute(empty_inventory_query)
+        row = cur.fetchone()
+        if row:
+            oos_count = row[0]
+
+        return {
+            "total_revenue": total_rev,
+            "best_customer": best_name,
+            "best_customer_spend": best_spend,
+            "out_of_stock": oos_count
+        }
+
 
 
 
