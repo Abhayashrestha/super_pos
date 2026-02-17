@@ -52,12 +52,37 @@ class Catalog:
 
     def dashboard_data(self):
         dash=storage.get_dashboard_data(self.connection)
-        if dash['out_of_stock']==0:
-            status='healthy'
-        elif dash['out_of_stock'] <= 5:
-            status='warning'
-        else:
-            status='critical'
+        total=dash['total_revenue']
+        customer=dash["best_customer"]
+        best_amount=dash['best_customer_spend']
+        out_of_stock=dash['out_of_stock']
+
+        def status_check():
+            if out_of_stock==0:
+                description='healthy'
+            elif out_of_stock <= 5:
+                description='warning'
+            else:
+                description='critical'
+            return description
+
+        def high_roller():
+            check=False
+            if total>0:
+                if best_amount/total>0.5:
+                    check=True
+            return check
+
+        status=status_check()
+        highroller=high_roller()
+
+        return {
+            'total_revenue':total,
+            'best_customer':customer,
+            'best_customer_spend':best_amount,
+            'status':status,
+            'highroller':highroller
+        }
 
 
 
