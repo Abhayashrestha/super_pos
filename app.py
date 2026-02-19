@@ -178,6 +178,11 @@ def checkout():
         flash(f"Purchase Failed: {str(e)}", "danger")
         return redirect(url_for('storefront'))
 
+@app.route('/dashboard')
+def dashboard():
+    report=engine.dashboard_data()
+    return render_template('dashboard.html',data=report)
+
 
 
 

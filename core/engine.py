@@ -52,10 +52,13 @@ class Catalog:
 
     def dashboard_data(self):
         dash=storage.get_dashboard_data(self.connection)
-        total=dash['total_revenue']
-        customer=dash["best_customer"]
-        best_amount=dash['best_customer_spend']
-        out_of_stock=dash['out_of_stock']
+        total=dash.get('total_revenue',0)
+        customer=dash.get("top_customers",[])
+        out_of_stock=dash.get('out_of_stock',0)
+        best_seller=dash.get('best_sellers',[])
+        worst_seller=dash.get('worst_sellers',[])
+        unsold=dash.get('unsold')
+
 
         def status_check():
             if out_of_stock==0:
@@ -68,8 +71,8 @@ class Catalog:
 
         def high_roller():
             check=False
-            if total>0:
-                if best_amount/total>0.5:
+            if total>0 and customer:
+                if float(customer[0]['spent'])/float(total)>0.5:
                     check=True
             return check
 
@@ -79,9 +82,11 @@ class Catalog:
         return {
             'total_revenue':total,
             'best_customer':customer,
-            'best_customer_spend':best_amount,
             'status':status,
-            'highroller':highroller
+            'highroller':highroller,
+            'best_seller':best_seller,
+            'worst_seller':worst_seller,
+            'unsold':unsold
         }
 
 
