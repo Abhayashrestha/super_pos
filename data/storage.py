@@ -192,19 +192,43 @@ def get_dashboard_data(connection):
                         join sale_item si on s.sale_id=si.sale_id
                         group by s.customer_name
                         order by total desc
-                        limit 1
+                        limit 3
                         """
         empty_inventory_query="""
                                 select count(quantity) as items_out_of_stock
                                 from products
                                 where quantity=0
-                            """
+                                """
+        best_products_query='''
+                                select p.name,sum(si.quantity) as total_sold
+                                from products p
+                                join sale_item si on si.product_id=p.product_id
+                                group by p.product_id
+                                order by total_sold desc
+                                limit 3
+                            '''
+        worst_products_query='''
+                                select p.name,sum(si.quantity) as total_sold
+                                from products p
+                                join sale_item si on si.product_id=p.product_id
+                                group by p.product_id
+                                order by total_sold
+                                limit 3
+                            '''
+        unsold_products_query='''
+                                select p.name
+                                from products p
+                                left join sale_item si on si.product_id=p.product_id
+                                group by p.product_id
+                                having count(si.product_id)=0
+                                '''
 
         total_rev = 0
-        best_name = "N/A"
-        best_spend = 0
+        best_name = []
         oos_count = 0
-
+        best_sellers=[]
+        worst_sellers=[]
+        unsold=[]
 
         cur.execute(total_revenue_query)
         row = cur.fetchone()
@@ -212,23 +236,44 @@ def get_dashboard_data(connection):
             total_rev = row[0]
 
         cur.execute(best_customer_query)
-        row = cur.fetchone()
+        row = cur.fetchall()
         if row:
-            best_name = row[0]
-            best_spend = row[1]
+            best_name=[{'name':r[0],'spent':float(r[1])} for r in row ]
+
 
         cur.execute(empty_inventory_query)
         row = cur.fetchone()
         if row:
             oos_count = row[0]
 
+        cur.execute(best_products_query)
+        row=cur.fetchall()
+        if row:
+            best_sellers=[{'product':r[0],'sold':r[1]}for r in row]
+
+        cur.execute(worst_products_query)
+        row=cur.fetchall()
+        if row:
+            worst_sellers= [{'product':row[0],'sold':row[1]} for row in row]
+
+        cur.execute(unsold_products_query)
+        row=cur.fetchall()
+        if row:
+            unsold=[x[0] for x in row]
+
+
+
+
         return {
             "total_revenue": total_rev,
-            "best_customer": best_name,
-            "best_customer_spend": best_spend,
-            "out_of_stock": oos_count
+            "top_customers": best_name,
+            "out_of_stock": oos_count,
+            "best_sellers":best_sellers,
+            "worst_sellers":worst_sellers,
+            "unsold":unsold
+
         }
 
 
-
+print(get_dashboard_data(connect))
 

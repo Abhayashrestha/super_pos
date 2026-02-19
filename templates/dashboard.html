@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .metric-card { background: #ffffff; border-radius: 20px; border: 1px solid #f1f5f9; padding: 1.5rem; margin-bottom: 1rem; }
+    .status-indicator { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+    .critical-bg { background-color: #ef4444; }
+    .warning-bg { background-color: #f59e0b; }
+    .healthy-bg { background-color: #22c55e; }
+</style>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="fw-800">ABHAYA STORE INSIGHTS</h1>
+            <span class="badge bg-light text-dark border p-2">
+                <span class="status-indicator
+                    {% if data['status'] == 'critical' %}critical-bg
+                    {% elif data['status'] == 'warning' %}warning-bg
+                    {% else %}healthy-bg{% endif %} me-2"></span>
+                SYSTEM: {{ data['status']|upper }}
+            </span>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="metric-card shadow-sm">
+                    <p class="text-muted small fw-bold text-uppercase mb-1">Total Revenue</p>
+                    <h2 class="fw-800 text-dark">${{ "{:,.2f}".format(data['total_revenue']) }}</h2>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="metric-card shadow-sm {% if data['highroller'] %}border-danger{% endif %}">
+                    <p class="text-muted small fw-bold text-uppercase mb-1">Top Customer Analysis</p>
+                    {% if data['best_customer'] %}
+                        <h4 class="fw-800 mb-0">{{ data['best_customer'][0]['name'] }}</h4>
+                        <p class="text-muted small mb-0">Total Contribution: ${{ "{:,.2f}".format(data['best_customer'][0]['spent']) }}</p>
+                        {% if data['highroller'] %}
+                            <span class="badge bg-danger">HIGH ROLLER DETECTED</span>
+                        {% endif %}
+                    {% else %}
+                        <p class="text-muted">No Customer Data</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-3">
+            <div class="col-md-4">
+                <div class="metric-card shadow-sm">
+                    <h6 class="fw-bold text-uppercase small text-muted mb-3">Top 3 Moving Goods</h6>
+                    {% for item in data['best_seller'] %}
+                        <div class="d-flex justify-content-between border-bottom py-2">
+                            <span>{{ item.product }}</span>
+                            <span class="fw-bold">{{ item.sold }} Units</span>
+                        </div>
+                    {% else %}
+                        <p class="text-muted small">No sales recorded.</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="metric-card shadow-sm">
+                    <h6 class="fw-bold text-uppercase small text-muted mb-3">Underperformers</h6>
+                    {% for item in data['worst_seller'] %}
+                        <div class="d-flex justify-content-between border-bottom py-2">
+                            <span>{{ item.product }}</span>
+                            <span class="text-danger">{{ item.sold }} Units</span>
+                        </div>
+                    {% else %}
+                        <p class="text-muted small">No low-volume data.</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="metric-card shadow-sm">
+                    <h6 class="fw-bold text-uppercase small text-muted mb-3">Ghost Inventory (0 Sales)</h6>
+                    {% for product_name in data['unsold'] %}
+                        <span class="badge bg-dark mb-1">{{ product_name }}</span>
+                    {% else %}
+                        <p class="text-muted small">All items have sold.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
