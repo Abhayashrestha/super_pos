@@ -180,6 +180,17 @@ def db_get_all_sales(connection):
 
     return display
 
+
+def log_missed_sale(connection,p_id,qty,name):
+    with connection.cursor() as cur:
+        missed_sale_query="""
+                    Insert into missed_sales (product_id,requested_quantity,customer_name)
+                    Values (%s,%s,%s)
+                    """
+        cur.execute(missed_sale_query,p_id,qty,name)
+        connection.commit()
+
+
 def get_dashboard_data(connection):
     with connection.cursor() as cur:
         total_revenue_query="""
