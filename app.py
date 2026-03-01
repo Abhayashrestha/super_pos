@@ -170,7 +170,7 @@ def checkout():
         if sale:
             flash("Purchase Successful")
             session.pop('cart',None)
-            return redirect(url_for('show_receipt',s_id=sale))
+            return redirect(url_for('show_receipt',s_id=sale['s_id']))
     except ValueError as e:
         flash(f"Purchase Failed: {str(e)}", "danger")
         return redirect(url_for('storefront'))
@@ -182,15 +182,6 @@ def checkout():
 def dashboard():
     report=engine.dashboard_data()
     return render_template('dashboard.html',data=report)
-
-
-
-
-
-
-
-
-
 
 
 

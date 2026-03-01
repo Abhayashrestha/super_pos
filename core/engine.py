@@ -27,12 +27,14 @@ class Catalog:
     def purchase_processing(self,basket,cus_name):
         for p_id,qty in basket.items():
             product=self.search_product(p_id)
-            if not product or product["quantity"]<qty:
+            if not product or product.quantity<qty:
                 storage.log_missed_sale(self.connection, p_id, cus_name, qty)
                 return {"status": "error", "message": f"Stock low for {p_id}"}
         try:
             s_id = storage.sales_processing(self.connection, basket, cus_name)
             return {"status": "success", "s_id": s_id}
+
+
         except Exception as e:
             return {"status": "error", "message": str(e)}
 
