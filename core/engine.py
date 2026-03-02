@@ -28,7 +28,7 @@ class Catalog:
         for p_id,qty in basket.items():
             product=self.search_product(p_id)
             if not product or product.quantity<qty:
-                storage.log_missed_sale(self.connection, p_id, cus_name, qty)
+                storage.log_missed_sale(self.connection, p_id, qty, cus_name)
                 return {"status": "error", "message": f"Stock low for {p_id}"}
         try:
             s_id = storage.sales_processing(self.connection, basket, cus_name)
