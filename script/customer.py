@@ -5,11 +5,11 @@ from core.engine import Catalog
 
 
 
-bot_names=["piers", "john", "josh", "johny", "arthur",
-    "clav", "togi", "steve", "jake", "Finn"]
-qty=[1,2,3,4,5,6,7]
 
-def bot_purchase(bot_name,quantity):
+def bot_purchase():
+    bot_name = ["piers", "john", "josh", "johny", "arthur",
+                 "clav", "togi", "steve", "jake", "Finn"]
+    quantity = [1, 2, 3, 4, 5, 6, 7]
     connection = storage.get_connection()
     engine = Catalog(connection)
     try:
@@ -42,7 +42,7 @@ def bot_purchase(bot_name,quantity):
 
 
 if __name__ == "__main__":
-    bot_purchase(bot_names,qty)
+    bot_purchase()
 
 
 

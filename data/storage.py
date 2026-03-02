@@ -4,7 +4,7 @@ def get_connection():
     creds={"host":"localhost",
            "database":"posdb",
            "user":"postgres",
-           "password":"#$1"}
+           "password":"S#$1"}
 
     try:
         connection=psycopg2.connect(**creds)
@@ -187,7 +187,7 @@ def log_missed_sale(connection,p_id,qty,name):
                     Insert into missed_sales (product_id,requested_quantity,customer_name)
                     Values (%s,%s,%s)
                     """
-        cur.execute(missed_sale_query,p_id,qty,name)
+        cur.execute(missed_sale_query,(p_id,qty,name))
         connection.commit()
 
 
