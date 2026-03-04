@@ -34,6 +34,20 @@ def db_add_product(connection,product):
         print(f"{e} error has occurred")
         return None
 
+def edit_price(connection,new_price,p_id):
+    try:
+        with connection.cursor as cur:
+            edit_sql="""update products
+                        set price=%s
+                        where product_id=%s 
+                    """
+            cur.execute(edit_sql,(new_price,p_id))
+            connection.commit()
+            print(f"Price:{new_price} has been updated")
+    except Exception as e:
+        print(f"{e} error has occurred")
+        connection.rollback()
+
 
 
 def db_delete_product(connection,p_id):
