@@ -34,7 +34,7 @@ def db_add_product(connection,product):
         print(f"{e} error has occurred")
         return None
 
-def edit_price(connection,new_price,p_id):
+def db_edit_price(connection,new_price,p_id):
     try:
         with connection.cursor as cur:
             edit_sql="""update products
