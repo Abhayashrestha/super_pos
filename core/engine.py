@@ -24,6 +24,10 @@ class Catalog:
         delete=storage.db_delete_product(self.connection,product_id)
         return delete
 
+    def edit_price(self,new_price,p_id):
+        edit=storage.db_edit_price(self.connection,new_price,p_id)
+        return edit
+
     def purchase_processing(self,basket,cus_name):
         for p_id,qty in basket.items():
             product=self.search_product(p_id)
