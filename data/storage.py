@@ -36,11 +36,8 @@ def db_add_product(connection,product):
 
 def db_edit_price(connection,new_price,p_id):
     try:
-        with connection.cursor as cur:
-            edit_sql="""update products
-                        set price=%s
-                        where product_id=%s 
-                    """
+        with connection.cursor() as cur:
+            edit_sql="update products set price=%s where product_id=%s "
             cur.execute(edit_sql,(new_price,p_id))
             connection.commit()
             print(f"Price:{new_price} has been updated")
