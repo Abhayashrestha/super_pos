@@ -74,6 +74,8 @@ def buy_product(p_id):
 
     return redirect(url_for('show_receipt'))
 
+
+
 @app.route('/admin',methods=['GET','POST'])
 def admin():
     inventory=engine.display_product()
@@ -109,7 +111,19 @@ def update_stock(p_id):
         flash(f"Error: {str(e)}", "danger")
 
     return redirect(url_for('admin'))
-
+@app.route('/update-price/<int:p_id>', methods=['POST'])
+def update_price(p_id):
+    try:
+        if request.method=='POST':
+            price=request.form.get('new_price')
+            updated_price=int(price)
+            engine.edit_price(updated_price,p_id)
+            flash("price updated successfully","Success")
+        else:
+            flash("update failed",'danger')
+    except Exception as e:
+        flash(f"error: {str(e)}","danger")
+    return redirect(url_for("admin"))
 
 @app.route('/lookup-receipt', methods=['POST'])
 def lookup_receipt():  # Remove s_id from the arguments
