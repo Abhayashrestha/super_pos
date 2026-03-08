@@ -297,5 +297,37 @@ def get_dashboard_data(connection):
         }
 
 
+
 print(get_dashboard_data(connect))
+
+def get_data(connection):
+    out=[]
+    sql=""""
+        SELECT 
+        p.product_id,
+        p.name,
+        p.price,
+        date_trunc('hour', s.created_at) AS sale_hour,
+        COUNT(s.sale_id) AS units_sold,
+        (SELECT COUNT(*) FROM missed_sales m 
+        WHERE m.product_id = p.product_id 
+        AND date_trunc('hour', m.created_at) = date_trunc('hour', s.created_at)) AS units_missed
+    FROM products p
+    JOIN sales_items si ON p.product_id = si.product_id
+    JOIN sales s ON si.sale_id = s.sale_id
+    GROUP BY p.product_id, p.name, p.price, sale_hour
+    ORDER BY sale_hour ASC, p.product_id;
+        """
+    try:
+        with connection.cursor() as cur:
+            cur.execute(sql)
+            cur.fetchall()
+            key=cur.description[0]
+            for row in cur.fetchall():
+                item_dict=dict(zip(key,row))
+                out.append(item_dict)
+
+            return out
+    except Exception as e:
+        print(f"{e} error has occurred")
 
