@@ -3,3 +3,4 @@ qrcode[pill]
 flask
 
 werkzeug
+pandas
