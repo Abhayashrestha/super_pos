@@ -321,12 +321,10 @@ def get_data(connection):
     try:
         with connection.cursor() as cur:
             cur.execute(sql)
-            cur.fetchall()
-            key=cur.description[0]
-            for row in cur.fetchall():
-                item_dict=dict(zip(key,row))
-                out.append(item_dict)
-
+            row=cur.fetchall()
+            key=[desc[0] for desc in cur.description]
+            for r in row:
+                out.append(dict(zip(key,row)))
             return out
     except Exception as e:
         print(f"{e} error has occurred")

@@ -103,6 +103,9 @@ class Catalog:
             'worst_seller':worst_seller,
             'unsold':unsold
         }
+    def get_analytics(self):
+        data=storage.get_data(self.connection)
+        return data
 
 
 

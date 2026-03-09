@@ -1,14 +1,19 @@
+import pandas as pd
+from data import storage
+from core import engine
+database=storage.get_connection()
+engine=engine.Catalog(database)
+
+
 class DataProcessor:
     def __init__(self):
-        self.data = None
-        self.models = {}  # Store m and b for each product_id
+        self.df = None
+        self.data = engine
+        self.models = {}
 
     def load_data(self):
-        """
-        Extracts the Harvest Query results from Postgres into a Pandas DataFrame.
-        """
-        # Logic: Use your storage.get_connection() and pd.read_sql()
-        pass
+        self.df=pd.DataFrame(self.data.get_analytics())
+        print(self.df.shape)
 
     def prepare_features(self):
         """
