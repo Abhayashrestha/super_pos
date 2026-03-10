@@ -16,12 +16,9 @@ class DataProcessor:
         print(self.df.shape)
 
     def prepare_features(self):
-        """
-        Cleans data: Truncates time, handles missing hours,
-        and calculates 'Total Demand' (Sales + Missed).
-        """
-        # Logic: df['total_demand'] = df['units_sold'] + df['units_missed']
-        pass
+       self.df.fillna(0,inplace=True)
+       self.df["total_demand"]=self.df["units_sold"]+self.df["units_missed"]
+       print(self.df["total_demand"])
 
     def train_linear_models(self):
         """
