@@ -38,8 +38,6 @@ class DataProcessor:
 
 
 
-
-
     def predict_stockout(self, product_id, future_hours=1):
         pass
 
