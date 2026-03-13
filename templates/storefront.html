@@ -1,76 +1,161 @@
 {% extends "base.html" %}
 
 {% block content %}
-<header class="pb-3 mb-4 border-bottom d-flex justify-content-between align-items-center">
-    <div>
-        <h1 class="h2 fw-bold text-dark mb-0">Abayas Store</h1>
-        <p class="text-muted small mb-0">Premium Collection 2026</p>
-    </div>
+<style>
+    /* Premium Design Tokens */
+    :root {
+        --premium-black: #111111;
+        --soft-gray: #f8f9fa;
+        --glass-white: rgba(255, 255, 255, 0.85);
+        --transition-smooth: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+    }
 
-    <a href="{{ url_for('view_cart') }}" class="btn btn-outline-dark position-relative px-4 fw-bold shadow-sm">
-        <i class="bi bi-bag-check-fill me-2"></i> View Cart
-        {% if session.get('cart') %}
-        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-            {{ session.get('cart')|length }}
-        </span>
-        {% endif %}
-    </a>
-</header>
+    /* Page Header Elevation */
+    .store-header {
+        padding: 4rem 0 2rem 0;
+    }
 
-<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-    {% for product in products %}
-    <div class="col">
-        <div class="card h-100 border-0 shadow-sm position-relative" style="border-radius: 15px; overflow: hidden;">
+    .brand-title {
+        font-family: 'Inter', sans-serif;
+        font-weight: 800;
+        letter-spacing: -3px;
+        font-size: 3.5rem;
+        color: var(--premium-black);
+    }
 
-            <span class="badge position-absolute top-0 end-0 m-3 {{ 'bg-success' if product.quantity > 0 else 'bg-danger' }}">
-                {{ product.quantity if product.quantity > 0 else 'Out of' }} Stock
-            </span>
+    /* The "Magnum Opus" Card */
+    .product-card {
+        border: none !important;
+        background: var(--glass-white);
+        backdrop-filter: blur(20px);
+        border-radius: 24px !important;
+        transition: var(--transition-smooth);
+        overflow: hidden;
+    }
 
-            <img src="{{ url_for('static', filename='uploads/' + (product.image_path if product.image_path else 'default.jpg')) }}"
-                 class="card-img-top" alt="{{ product.name }}" style="height: 280px; object-fit: cover;">
+    .product-card:hover {
+        transform: translateY(-12px);
+        box-shadow: 0 30px 60px rgba(0,0,0,0.12) !important;
+    }
 
-            <div class="card-body d-flex flex-column">
-                <div class="mb-3">
-                    <h5 class="card-title fw-bold mb-1">{{ product.name }}</h5>
-                    <span class="badge bg-light text-muted text-uppercase tracking-wider" style="font-size: 0.7rem;">
-                        {{ product.category }}
-                    </span>
+    .img-container {
+        height: 350px;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .product-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 1.2s ease;
+    }
+
+    .product-card:hover .product-img {
+        transform: scale(1.1);
+    }
+
+    /* Modern UI Components */
+    .btn-premium {
+        border-radius: 50px !important;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        padding: 14px;
+        transition: var(--transition-smooth);
+    }
+
+    .qty-input {
+        border-radius: 50px !important;
+        background-color: var(--soft-gray) !important;
+        border: none !important;
+        font-weight: 600;
+    }
+
+    .badge-stock {
+        font-size: 0.6rem;
+        font-weight: 800;
+        padding: 8px 14px;
+        border-radius: 50px;
+        letter-spacing: 1px;
+    }
+</style>
+
+<div class="container">
+    <header class="store-header d-flex justify-content-between align-items-end mb-5">
+        <div>
+            <h1 class="brand-title mb-0">Abaya's Store</h1>
+            <p class="text-muted text-uppercase fw-bold small ls-3" style="letter-spacing: 4px;">Premium AI Driven Collection 2026</p>
+        </div>
+        <a href="{{ url_for('view_cart') }}" class="btn btn-dark btn-premium px-5 shadow-sm">
+            <i class="bi bi-bag-heart me-2"></i> Cart
+            {% if session.get('cart') %}
+                <span class="ms-2 badge rounded-pill bg-white text-dark">{{ session.get('cart')|length }}</span>
+            {% endif %}
+        </a>
+    </header>
+
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-5">
+        {% for product in products %}
+        <div class="col">
+            <div class="card h-100 product-card shadow-sm">
+
+                <div class="position-absolute top-0 end-0 m-3 z-3">
+                    {% if product.quantity > 0 %}
+                        <span class="badge bg-white text-dark badge-stock border shadow-sm">IN STOCK</span>
+                    {% else %}
+                        <span class="badge bg-danger text-white badge-stock shadow-sm">SOLD OUT</span>
+                    {% endif %}
                 </div>
 
-                <div class="mt-auto">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <span class="h4 mb-0 text-primary fw-bold">${{ "%.2f"|format(product.price) }}</span>
+                <div class="img-container">
+                    <img src="{{ url_for('static', filename='uploads/' + (product.image_path if product.image_path else 'default.jpg')) }}"
+                         class="product-img" alt="{{ product.name }}">
+                </div>
+
+                <div class="card-body p-4 d-flex flex-column">
+                    <div class="mb-4">
+                        <p class="text-muted text-uppercase small fw-bold mb-1" style="font-size: 0.65rem;">{{ product.category }}</p>
+                        <h3 class="fw-bold text-dark mb-0">{{ product.name }}</h3>
                     </div>
 
-                    <form action="{{ url_for('add_item_to_cart', p_id=product.product_id) }}" method="POST">
-                        <div class="input-group mb-2">
-                            <span class="input-group-text bg-light border-end-0">Qty</span>
-                            <input type="number" name="quantity" class="form-control border-start-0"
-                                   value="1" min="1" max="{{ product.quantity }}"
-                                   {{ 'disabled' if product.quantity <= 0 }} required>
+                    <div class="mt-auto">
+                        <div class="mb-4">
+                            <span class="display-6 fw-light text-dark">$ {{ "%.2f"|format(product.price) }}</span>
                         </div>
 
-                        <button type="submit" class="btn btn-dark w-100 fw-bold py-2 shadow-sm"
-                                {{ 'disabled' if product.quantity <= 0 }}>
-                            {% if product.quantity > 0 %}
-                                <i class="bi bi-cart-plus me-2"></i> Add to Cart
-                            {% else %}
-                                Sold Out
-                            {% endif %}
-                        </button>
-                    </form>
+                        <form action="{{ url_for('add_item_to_cart', p_id=product.product_id) }}" method="POST">
+                            <div class="row g-2">
+                                <div class="col-4">
+                                    <input type="number" name="quantity" class="form-control qty-input text-center h-100"
+                                           value="1" min="1" max="{{ product.quantity }}"
+                                           {{ 'disabled' if product.quantity <= 0 }} required>
+                                </div>
+                                <div class="col-8">
+                                    <button type="submit" class="btn btn-dark w-100 btn-premium shadow-sm h-100"
+                                            {{ 'disabled' if product.quantity <= 0 }}>
+                                        {% if product.quantity > 0 %}
+                                            Add to Bag
+                                        {% else %}
+                                            Unavailable
+                                        {% endif %}
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
+        {% endfor %}
     </div>
-    {% endfor %}
-</div>
 
-{% if not products %}
-<div class="text-center py-5">
-    <h3 class="text-muted">Inventory is currently empty.</h3>
-    <a href="{{ url_for('admin') }}" class="btn btn-primary mt-3">Go to Admin Panel</a>
+    {% if not products %}
+    <div class="text-center py-5 mt-5">
+        <h2 class="fw-light text-muted">The vault is currently empty.</h2>
+        <a href="{{ url_for('admin') }}" class="btn btn-outline-dark btn-premium mt-3 px-5">Admin Portal</a>
+    </div>
+    {% endif %}
 </div>
-{% endif %}
-
 {% endblock %}
