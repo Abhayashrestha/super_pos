@@ -2,88 +2,136 @@
 
 {% block content %}
 <style>
-    .metric-card { background: #ffffff; border-radius: 20px; border: 1px solid #f1f5f9; padding: 1.5rem; margin-bottom: 1rem; }
-    .status-indicator { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
-    .critical-bg { background-color: #ef4444; }
-    .warning-bg { background-color: #f59e0b; }
-    .healthy-bg { background-color: #22c55e; }
+    :root {
+        --bg-deep: #0f172a;
+        --card-bg: #1e293b;
+        --accent-emerald: #10b981;
+        --accent-amber: #f59e0b;
+        --accent-rose: #f43f5e;
+        --text-main: #f8fafc;
+        --text-muted: #94a3b8;
+    }
+
+    body { background-color: var(--bg-deep); color: var(--text-main); }
+
+    .insight-card {
+        background: var(--card-bg);
+        border: 1px solid rgba(255,255,255,0.05);
+        border-radius: 16px;
+        padding: 1.5rem;
+        height: 100%;
+        transition: transform 0.2s ease;
+    }
+
+    .insight-card:hover { transform: translateY(-4px); border-color: rgba(255,255,255,0.1); }
+
+    .stat-label {
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        font-weight: 700;
+        color: var(--text-muted);
+    }
+
+    .status-pill {
+        padding: 6px 16px;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 800;
+        letter-spacing: 1px;
+    }
+
+    .border-glow-critical { border-left: 4px solid var(--accent-rose); }
+    .border-glow-warning { border-left: 4px solid var(--accent-amber); }
+    .border-glow-healthy { border-left: 4px solid var(--accent-emerald); }
+
+    .data-row {
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+        padding: 10px 0;
+    }
+
+    .data-row:last-child { border-bottom: none; }
+
+    .ghost-badge {
+        background: rgba(244, 63, 94, 0.1);
+        color: var(--accent-rose);
+        border: 1px solid rgba(244, 63, 94, 0.2);
+        font-size: 0.7rem;
+    }
 </style>
 
-<div class="row">
-    <div class="col-md-12">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="fw-800">ABHAYA STORE INSIGHTS</h1>
-            <span class="badge bg-light text-dark border p-2">
-                <span class="status-indicator
-                    {% if data['status'] == 'critical' %}critical-bg
-                    {% elif data['status'] == 'warning' %}warning-bg
-                    {% else %}healthy-bg{% endif %} me-2"></span>
-                SYSTEM: {{ data['status']|upper }}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-end mb-5">
+        <div>
+            <h6 class="stat-label mb-1">Advanced Analytics</h6>
+            <h1 class="display-5 fw-900 mb-0" style="letter-spacing: -2px;">COMMAND CENTER</h1>
+        </div>
+        <div>
+            {% set status_class = 'bg-danger' if data['status'] == 'critical' else ('bg-warning' if data['status'] == 'warning' else 'bg-success') %}
+            <span class="status-pill {{ status_class }} text-white shadow-lg">
+                <i class="bi bi-cpu-fill me-2"></i>{{ data['status']|upper }}
             </span>
         </div>
+    </div>
 
-        <div class="row">
-            <div class="col-md-6">
-                <div class="metric-card shadow-sm">
-                    <p class="text-muted small fw-bold text-uppercase mb-1">Total Revenue</p>
-                    <h2 class="fw-800 text-dark">${{ "{:,.2f}".format(data['total_revenue']) }}</h2>
-                </div>
-            </div>
-
-            <div class="col-md-6">
-                <div class="metric-card shadow-sm {% if data['highroller'] %}border-danger{% endif %}">
-                    <p class="text-muted small fw-bold text-uppercase mb-1">Top Customer Analysis</p>
-                    {% if data['best_customer'] %}
-                        <h4 class="fw-800 mb-0">{{ data['best_customer'][0]['name'] }}</h4>
-                        <p class="text-muted small mb-0">Total Contribution: ${{ "{:,.2f}".format(data['best_customer'][0]['spent']) }}</p>
-                        {% if data['highroller'] %}
-                            <span class="badge bg-danger">HIGH ROLLER DETECTED</span>
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="insight-card border-glow-{{ data['status'] }} shadow-lg">
+                <div class="row align-items-center">
+                    <div class="col-md-7">
+                        <p class="stat-label">Gross Retained Revenue</p>
+                        <h1 class="display-3 fw-800 mb-0" style="color: var(--accent-emerald);">$ {{ "{:,.2f}".format(data['total_revenue']) }}</h1>
+                    </div>
+                    <div class="col-md-5 border-start border-secondary border-opacity-25 ps-4">
+                        <p class="stat-label">Primary Stakeholder</p>
+                        {% if data['best_customer'] %}
+                            <h4 class="fw-bold mb-1">{{ data['best_customer'][0]['name'] }}</h4>
+                            <p class="text-muted small mb-2">Contribution: <span class="text-white">${{ "{:,.2f}".format(data['best_customer'][0]['spent']) }}</span></p>
+                            {% if data['highroller'] %}
+                                <span class="badge bg-white text-dark fw-900 small p-2">TOP 1% CONTRIBUTOR</span>
+                            {% endif %}
+                        {% else %}
+                            <p class="text-muted italic">Awaiting Transaction Data...</p>
                         {% endif %}
-                    {% else %}
-                        <p class="text-muted">No Customer Data</p>
-                    {% endif %}
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="row mt-3">
-            <div class="col-md-4">
-                <div class="metric-card shadow-sm">
-                    <h6 class="fw-bold text-uppercase small text-muted mb-3">Top 3 Moving Goods</h6>
-                    {% for item in data['best_seller'] %}
-                        <div class="d-flex justify-content-between border-bottom py-2">
-                            <span>{{ item.product }}</span>
-                            <span class="fw-bold">{{ item.sold }} Units</span>
-                        </div>
-                    {% else %}
-                        <p class="text-muted small">No sales recorded.</p>
-                    {% endfor %}
-                </div>
-            </div>
-
-            <div class="col-md-4">
-                <div class="metric-card shadow-sm">
-                    <h6 class="fw-bold text-uppercase small text-muted mb-3">Underperformers</h6>
-                    {% for item in data['worst_seller'] %}
-                        <div class="d-flex justify-content-between border-bottom py-2">
-                            <span>{{ item.product }}</span>
-                            <span class="text-danger">{{ item.sold }} Units</span>
-                        </div>
-                    {% else %}
-                        <p class="text-muted small">No low-volume data.</p>
-                    {% endfor %}
-                </div>
-            </div>
-
-            <div class="col-md-4">
-                <div class="metric-card shadow-sm">
-                    <h6 class="fw-bold text-uppercase small text-muted mb-3">Ghost Inventory (0 Sales)</h6>
+        <div class="col-lg-4">
+            <div class="insight-card">
+                <p class="stat-label mb-3">Stagnant Capital (Ghost Items)</p>
+                <div class="d-flex flex-wrap gap-2">
                     {% for product_name in data['unsold'] %}
-                        <span class="badge bg-dark mb-1">{{ product_name }}</span>
+                        <span class="badge ghost-badge p-2">{{ product_name }}</span>
                     {% else %}
-                        <p class="text-muted small">All items have sold.</p>
+                        <span class="text-muted small">No stagnant inventory detected. Perfect turnover.</span>
                     {% endfor %}
                 </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="insight-card">
+                <h6 class="stat-label mb-4"><i class="bi bi-graph-up-arrow me-2 text-success"></i>High-Velocity Assets</h6>
+                {% for item in data['best_seller'] %}
+                    <div class="d-flex justify-content-between data-row">
+                        <span class="fw-medium text-white">{{ item.product }}</span>
+                        <span class="fw-bold" style="color: var(--accent-emerald);">{{ item.sold }} Units</span>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="insight-card">
+                <h6 class="stat-label mb-4"><i class="bi bi-graph-down-arrow me-2 text-danger"></i>Low-Velocity Assets</h6>
+                {% for item in data['worst_seller'] %}
+                    <div class="d-flex justify-content-between data-row">
+                        <span class="fw-medium text-white-50">{{ item.product }}</span>
+                        <span class="fw-bold text-danger">{{ item.sold }} Units</span>
+                    </div>
+                {% endfor %}
             </div>
         </div>
     </div>
