@@ -1,183 +1,195 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="row mb-5 align-items-center">
-    <div class="col-md-6">
-        <h1 class="fw-800 mb-0">ABHAYA STORE</h1>
-        <p class="text-muted text-uppercase small letter-spacing-1">Inventory & Operations Command</p>
-    </div>
+<style>
+    :root {
+        --admin-bg: #f8fafc;
+        --card-radius: 20px;
+        --accent-dark: #0f172a;
+    }
 
-    <div class="col-md-6">
-        <div class="card border-0 shadow-sm p-2" style="border-radius: 12px;">
-            <form action="/lookup-receipt" method="POST" class="d-flex">
-                <input type="number" name="s_id" class="form-control border-0 bg-transparent" placeholder="Enter Receipt ID to Search..." required>
-                <button type="submit" class="btn btn-dark px-4 rounded-3">Lookup</button>
+    .admin-header { padding: 3rem 0; }
+
+    .search-pill {
+        background: white;
+        border-radius: 50px;
+        padding: 5px 10px 5px 25px;
+        border: 1px solid #e2e8f0;
+        transition: all 0.3s ease;
+    }
+
+    .search-pill:focus-within {
+        border-color: var(--accent-dark);
+        box-shadow: 0 0 0 4px rgba(15, 23, 42, 0.05);
+    }
+
+    .table-card {
+        border-radius: var(--card-radius);
+        border: none;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.02);
+        overflow: hidden;
+    }
+
+    .table thead {
+        background: #f1f5f9;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-size: 0.7rem;
+    }
+
+    .action-input {
+        max-width: 100px;
+        border-radius: 8px 0 0 8px !important;
+        border: 1px solid #e2e8f0;
+        background: #f8fafc;
+    }
+
+    .action-btn {
+        border-radius: 0 8px 8px 0 !important;
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .btn-add {
+        border-radius: 50px;
+        padding: 10px 25px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+    }
+
+    .img-admin {
+        width: 48px;
+        height: 48px;
+        object-fit: cover;
+        border-radius: 12px;
+    }
+</style>
+
+<div class="container-fluid px-lg-5">
+    <header class="admin-header row align-items-center">
+        <div class="col-lg-7">
+            <h1 class="display-6 fw-900 text-dark mb-0" style="letter-spacing: -2px;">COMMAND CENTER</h1>
+            <p class="text-muted small text-uppercase ls-widest">Inventory & Operations Management</p>
+        </div>
+        <div class="col-lg-5">
+            <form action="/lookup-receipt" method="POST" class="search-pill d-flex align-items-center">
+                <i class="bi bi-search text-muted me-2"></i>
+                <input type="number" name="s_id" class="form-control border-0 bg-transparent py-2" placeholder="Scan Receipt ID..." required>
+                <button type="submit" class="btn btn-dark rounded-pill px-4">LOOKUP</button>
             </form>
         </div>
+    </header>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="d-flex gap-3">
+            <a href="/dashboard" class="btn btn-white border shadow-sm rounded-pill px-4 fw-bold">
+                <i class="bi bi-bar-chart-fill me-2 text-primary"></i> INSIGHTS
+            </a>
+            <button class="btn btn-white border shadow-sm rounded-pill px-4 fw-bold">
+                <i class="bi bi-robot me-2 text-success"></i> CHAT AI
+            </button>
+        </div>
+        <button type="button" class="btn btn-dark btn-add shadow-lg" data-bs-toggle="modal" data-bs-target="#addProductModal">
+            <i class="bi bi-plus-lg me-2"></i> NEW PRODUCT
+        </button>
     </div>
-</div>
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h4 class="fw-bold mb-0">At a glance</h4>
-    <div>
-        <a href="/dashboard" class="btn btn-outline-dark shadow-sm px-4 fw-bold me-2">📊 View Insights</a>
-    </div>
-</div>
-
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h4 class="fw-bold mb-0">Active Catalog</h4>
-    <button type="button" class="btn btn-primary shadow-sm px-4 fw-bold" data-bs-toggle="modal" data-bs-target="#addProductModal">
-        + Add New Product
-    </button>
-</div>
-
-
-<div class="card shadow-sm border-0" style="border-radius: 15px; overflow: hidden;">
-    <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0">
-            <thead class="bg-light text-muted small text-uppercase">
-                <tr>
-                    <th class="ps-4">Product Details</th>
-                    <th>Category</th>
-                    <th>Price</th>
-                    <th style="width: 200px;">Stock Management</th>
-                    <th style="width: 200px;">Price Update</th>
-                    <th class="text-end pe-4">Actions</th>
-
-                </tr>
-            </thead>
-            <tbody>
-                {% for product in products %}
-                <tr>
-                    <td class="ps-4">
-                        <div class="d-flex align-items-center">
-                            <img src="{{ url_for('static', filename='uploads/' + (product.image_path if product.image_path else 'default.jpg')) }}"
-                                 class="rounded shadow-sm me-3" style="width: 50px; height: 50px; object-fit: cover;">
-                            <div>
-                                <div class="fw-bold text-dark">{{ product.name }}</div>
-                                <div class="text-muted extra-small">SKU: #{{ product.product_id }}</div>
+    <h5 class="fw-bold mb-3 d-flex align-items-center">
+        <span class="badge bg-dark me-2">{{ products|length }}</span> ACTIVE CATALOG
+    </h5>
+    <div class="card table-card mb-5">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th class="ps-4 py-3">Asset Details</th>
+                        <th>Category</th>
+                        <th>Price</th>
+                        <th>Stock Adjustment</th>
+                        <th>Global Price</th>
+                        <th class="text-end pe-4">System</th>
+                    </tr>
+                </thead>
+                <tbody class="border-top-0">
+                    {% for product in products %}
+                    <tr>
+                        <td class="ps-4">
+                            <div class="d-flex align-items-center py-2">
+                                <img src="{{ url_for('static', filename='uploads/' + (product.image_path or 'default.jpg')) }}" class="img-admin me-3 shadow-sm">
+                                <div>
+                                    <div class="fw-bold text-dark mb-0">{{ product.name }}</div>
+                                    <div class="text-muted extra-small">ID: #{{ product.product_id }}</div>
+                                </div>
                             </div>
-                        </div>
-                    </td>
-                    <td><span class="badge bg-secondary-subtle text-dark border-0 px-3">{{ product.category }}</span></td>
-                    <td class="fw-bold text-dark">${{ "%.2f"|format(product.price) }}</td>
-
-                    <td>
-                        <form action="/update-stock/{{ product.product_id }}" method="POST" class="input-group input-group-sm">
-                            <input type="number" name="new_qty" class="form-control text-center fw-bold" value="{{ product.quantity }}" min="0">
-                            <button class="btn btn-outline-dark" type="submit">Update</button>
-                        </form>
-                    </td>
-                    <td>
-                        <form action="/update-price/{{ product.product_id }}" method="POST" class="input-group input-group-sm">
-                            <input type="number" name="new_price" class="form-control text-center fw-bold" value="{{ product.price }}">
-                            <button class="btn btn-outline-dark" type="submit">Update</button>
-                        </form>
-                    </td>
-
-                    <td class="text-end pe-4">
-                        <form action="{{ url_for('delete_product', p_id=product.product_id) }}" method="POST" class="d-inline">
-                            <button type="submit" class="btn btn-sm text-danger border-0 p-0 fw-bold"
-                                    onclick="return confirm('Permanently remove {{ product.name }} from Abhaya Store?')">
-                                DELETE
-                            </button>
-                        </form>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                        </td>
+                        <td><span class="badge bg-light text-dark border px-3 rounded-pill">{{ product.category }}</span></td>
+                        <td class="fw-bold text-dark">${{ "%.2f"|format(product.price) }}</td>
+                        <td>
+                            <form action="/update-stock/{{ product.product_id }}" method="POST" class="input-group input-group-sm w-75">
+                                <input type="number" name="new_qty" class="form-control action-input text-center" value="{{ product.quantity }}">
+                                <button class="btn btn-outline-dark action-btn" type="submit">SET</button>
+                            </form>
+                        </td>
+                        <td>
+                            <form action="/update-price/{{ product.product_id }}" method="POST" class="input-group input-group-sm w-75">
+                                <input type="number" step="0.01" name="new_price" class="form-control action-input text-center" value="{{ product.price }}">
+                                <button class="btn btn-outline-dark action-btn" type="submit">EDIT</button>
+                            </form>
+                        </td>
+                        <td class="text-end pe-4">
+                            <form action="{{ url_for('delete_product', p_id=product.product_id) }}" method="POST">
+                                <button type="submit" class="btn btn-link text-danger text-decoration-none p-0 fw-bold small" onclick="return confirm('Archive this asset?')">
+                                    <i class="bi bi-trash3"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
-</div>
 
-<div class="modal fade" id="addProductModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
-            <div class="modal-header border-0 pb-0 pt-4 px-4">
-                <h4 class="fw-bold">New Inventory Item</h4>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <form action="/add-product" method="POST" enctype="multipart/form-data">
-                <div class="modal-body p-4">
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold text-muted">NAME</label>
-                        <input type="text" name="p_name" class="form-control bg-light border-0" required>
-                    </div>
-                    <div class="row">
-                        <div class="col-6 mb-3">
-                            <label class="form-label small fw-bold text-muted">PRICE ($)</label>
-                            <input type="number" step="0.01" name="p_price" class="form-control bg-light border-0" required>
-                        </div>
-                        <div class="col-6 mb-3">
-                            <label class="form-label small fw-bold text-muted">INITIAL STOCK</label>
-                            <input type="number" name="p_qty" class="form-control bg-light border-0" required>
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold text-muted">CATEGORY</label>
-                        <input type="text" name="p_category" class="form-control bg-light border-0" required>
-                    </div>
-                    <div class="mb-2">
-                        <label class="form-label small fw-bold text-muted">PRODUCT IMAGE</label>
-                        <input type="file" name="p_image" class="form-control bg-light border-0" accept="image/*">
-                    </div>
-                </div>
-                <div class="modal-footer border-0 p-4 pt-0">
-                    <button type="button" class="btn btn-light fw-bold" data-bs-dismiss="modal">Discard</button>
-                    <button type="submit" class="btn btn-dark px-4 fw-bold shadow-sm">Add to Catalog</button>
-                </div>
-            </form>
+    <h5 class="fw-bold mb-3"><i class="bi bi-clock-history me-2"></i>FINANCIAL AUDIT LOG</h5>
+    <div class="card table-card mb-5">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th class="ps-4 py-3">Transaction ID</th>
+                        <th>Timestamp</th>
+                        <th>Volume</th>
+                        <th class="text-end pe-4">Total Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sale in sales %}
+                    <tr style="cursor: pointer;">
+                        <td class="ps-4">
+                            <span class="fw-bold text-dark">#{{ sale.sale_id }}</span>
+                        </td>
+                        <td class="text-muted small">
+                            {{ sale.created_at.strftime('%b %d, %Y · %H:%M') }}
+                        </td>
+                        <td>
+                            <span class="text-dark">{{ sale.total_sales }} Items</span>
+                        </td>
+                        <td class="text-end pe-4 fw-bold text-success">
+                            + ${{ "%.2f"|format(sale.total_revenue) }}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="4" class="text-center py-5 text-muted">
+                            System idle. No recent transactions detected.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
-
-
-
-<div class="d-flex justify-content-between align-items-center mb-4 mt-5">
-    <h4 class="fw-bold mb-0">Financial Audit Log</h4>
-    <span class="badge bg-dark px-3 py-2">Total Transactions: {{ sales|length }}</span>
-</div>
-
-<div class="card shadow-sm border-0 mb-5" style="border-radius: 15px; overflow: hidden;">
-    <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0">
-            <thead class="bg-light text-muted small text-uppercase">
-                <tr>
-                    <th class="ps-4">Receipt ID</th>
-                    <th>Date & Time</th>
-                    <th>Items in Sale</th>
-                    <th class="text-end pe-4">Total Revenue</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for sale in sales %}
-                <tr>
-                    <td class="ps-4">
-                        <span class="fw-bold text-primary">#{{ sale.sale_id }}</span>
-                    </td>
-                    <td class="text-muted">
-                        {{ sale.created_at.strftime('%Y-%m-%d %H:%M') }}
-                    </td>
-                    <td>
-                        <span class="badge rounded-pill bg-light text-dark border fw-normal">
-                            {{ sale.total_sales }} Lines
-                        </span>
-                    </td>
-                    <td class="text-end pe-4 fw-800 text-success">
-                        ${{ "%.2f"|format(sale.total_revenue) }}
-                    </td>
-                </tr>
-                {% else %}
-                <tr>
-                    <td colspan="4" class="text-center py-5 text-muted">
-                        No transactions recorded yet. Data pipeline active.
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-</div>
-
 
 {% endblock %}
