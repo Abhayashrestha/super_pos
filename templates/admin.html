@@ -90,7 +90,7 @@
                 <i class="bi bi-robot me-2 text-success"></i> CHAT AI
             </button>
         </div>
-        <button type="button" class="btn btn-dark btn-add shadow-lg" data-bs-toggle="modal" data-bs-target="#addProductModal">
+        <button type="button" class="btn btn-dark btn-add shadow-lg" data-bs-toggle="modal" data-bs-target="#add_productModal">
             <i class="bi bi-plus-lg me-2"></i> NEW PRODUCT
         </button>
     </div>
@@ -188,6 +188,53 @@
                     {% endfor %}
                 </tbody>
             </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="add_productModal" tabindex="-1" aria-labelledby="modalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 24px;">
+            <div class="modal-header border-0 pt-4 px-4 pb-0">
+                <h3 class="fw-900 mb-0" id="modalTitle" style="letter-spacing: -1px;">NEW ASSET</h3>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <form action="/add-product" method="POST" enctype="multipart/form-data">
+                <div class="modal-body p-4">
+                    <div class="mb-4">
+                        <label class="stat-label mb-2 d-block">Product Nomenclature</label>
+                        <input type="text" name="p_name" class="form-control rounded-3 border-0 bg-light p-3 fw-bold" placeholder="name" required>
+                    </div>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-6">
+                            <label class="stat-label mb-2 d-block">Global Price ($)</label>
+                            <input type="number" step="0.01" name="p_price" class="form-control rounded-3 border-0 bg-light p-3 fw-bold" placeholder="0.00" required>
+                        </div>
+                        <div class="col-6">
+                            <label class="stat-label mb-2 d-block">Initial Inventory</label>
+                            <input type="number" name="p_qty" class="form-control rounded-3 border-0 bg-light p-3 fw-bold" placeholder="0" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="stat-label mb-2 d-block">Classification</label>
+                        <input type="text" name="p_category" class="form-control rounded-3 border-0 bg-light p-3 fw-bold" placeholder="Category" required>
+                    </div>
+
+                    <div class="mb-2">
+                        <label class="stat-label mb-2 d-block">Visual Asset (Upload)</label>
+                        <input type="file" name="p_image" class="form-control rounded-3 border-0 bg-light p-3" accept="image/*">
+                        <div class="form-text extra-small mt-2">Recommended: 1:1 Aspect Ratio, Max 5MB.</div>
+                    </div>
+                </div>
+
+                <div class="modal-footer border-0 p-4 pt-0">
+                    <button type="button" class="btn btn-light rounded-pill px-4 fw-bold" data-bs-dismiss="modal">DISCARD</button>
+                    <button type="submit" class="btn btn-dark rounded-pill px-5 fw-bold shadow-lg">INITIALIZE PRODUCT</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
