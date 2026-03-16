@@ -36,8 +36,6 @@ class DataProcessor:
             self.models={"m":m,"b":b}
 
 
-
-
     def predict_stockout(self, product_id, future_hours=1):
         pass
 
