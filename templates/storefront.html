@@ -85,11 +85,11 @@
 <div class="container">
     <header class="store-header d-flex justify-content-between align-items-end mb-5">
         <div>
-            <h1 class="brand-title mb-0">Abaya's Store</h1>
-            <p class="text-muted text-uppercase fw-bold small ls-3" style="letter-spacing: 4px;">Premium AI Driven Collection 2026</p>
+            <h1 class="brand-title mb-0">Abhaya's Collection</h1>
+            <p class="text-muted text-uppercase fw-bold small ls-3" style="letter-spacing: 4px;">Premium AI-Driven Logistics 2026</p>
         </div>
         <a href="{{ url_for('view_cart') }}" class="btn btn-dark btn-premium px-5 shadow-sm">
-            <i class="bi bi-bag-heart me-2"></i> Cart
+            <i class="bi bi-bag-heart me-2"></i> Bag
             {% if session.get('cart') %}
                 <span class="ms-2 badge rounded-pill bg-white text-dark">{{ session.get('cart')|length }}</span>
             {% endif %}
@@ -103,9 +103,9 @@
 
                 <div class="position-absolute top-0 end-0 m-3 z-3">
                     {% if product.quantity > 0 %}
-                        <span class="badge bg-white text-dark badge-stock border shadow-sm">IN STOCK</span>
+                        <span class="badge bg-white text-dark badge-stock border shadow-sm">AVAILABLE</span>
                     {% else %}
-                        <span class="badge bg-danger text-white badge-stock shadow-sm">SOLD OUT</span>
+                        <span class="badge bg-danger text-white badge-stock shadow-sm">RESTOCKING</span>
                     {% endif %}
                 </div>
 
@@ -117,7 +117,7 @@
                 <div class="card-body p-4 d-flex flex-column">
                     <div class="mb-4">
                         <p class="text-muted text-uppercase small fw-bold mb-1" style="font-size: 0.65rem;">{{ product.category }}</p>
-                        <h3 class="fw-bold text-dark mb-0">{{ product.name }}</h3>
+                        <h3 class="fw-bold text-dark mb-0 text-truncate">{{ product.name }}</h3>
                     </div>
 
                     <div class="mt-auto">
@@ -136,7 +136,7 @@
                                     <button type="submit" class="btn btn-dark w-100 btn-premium shadow-sm h-100"
                                             {{ 'disabled' if product.quantity <= 0 }}>
                                         {% if product.quantity > 0 %}
-                                            Add to Bag
+                                            Purchase Item
                                         {% else %}
                                             Unavailable
                                         {% endif %}
