@@ -1,81 +1,145 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container py-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-bold mb-0">Your Shopping Bag</h2>
-        <a href="{{ url_for('storefront') }}" class="btn btn-link text-dark text-decoration-none small">
-            <i class="bi bi-arrow-left"></i> Continue Shopping
+<style>
+    :root {
+        --bag-bg: #ffffff;
+        --accent-dark: #111111;
+        --soft-border: #f1f5f9;
+    }
+
+    .bag-container { padding-top: 4rem; padding-bottom: 6rem; }
+
+    .bag-card {
+        border: none !important;
+        background: var(--bag-bg);
+        border-radius: 24px !important;
+        transition: all 0.3s ease;
+    }
+
+    .product-row {
+        border-bottom: 1px solid var(--soft-border);
+        padding: 1.5rem 0;
+    }
+
+    .product-row:last-child { border-bottom: none; }
+
+    .img-thumb {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 16px;
+        background: #f8fafc;
+    }
+
+    .summary-card {
+        border: none !important;
+        background: #0f172a; /* Sophisticated Dark Summary */
+        color: white;
+        border-radius: 24px !important;
+        position: sticky;
+        top: 2rem;
+    }
+
+    .checkout-input {
+        background: rgba(255,255,255,0.05) !important;
+        border: 1px solid rgba(255,255,255,0.1) !important;
+        color: white !important;
+        border-radius: 12px !important;
+        padding: 12px 15px;
+    }
+
+    .checkout-input::placeholder { color: rgba(255,255,255,0.3); }
+
+    .btn-checkout {
+        border-radius: 50px !important;
+        padding: 16px;
+        font-weight: 800;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        transition: transform 0.2s ease;
+    }
+
+    .btn-checkout:hover:not(:disabled) {
+        transform: scale(1.02);
+        background: #ffffff !important;
+        color: #000000 !important;
+    }
+</style>
+
+<div class="container bag-container">
+    <div class="d-flex justify-content-between align-items-end mb-5">
+        <div>
+            <h1 class="fw-900 display-5 mb-0" style="letter-spacing: -2px;">YOUR BAG</h1>
+            <p class="text-muted small text-uppercase fw-bold ls-3 mb-0" style="letter-spacing: 3px;">Abhaya's Collection 2026</p>
+        </div>
+        <a href="{{ url_for('storefront') }}" class="text-dark fw-bold text-decoration-none small pb-1 border-bottom border-2 border-dark">
+            CONTINUE BROWSING
         </a>
     </div>
 
-    <div class="row">
-        <div class="col-lg-8">
-            <div class="card border-0 shadow-sm p-4" style="border-radius: 20px;">
+    <div class="row g-5">
+        <div class="col-lg-7">
+            <div class="card bag-card shadow-sm p-4">
                 {% if items %}
-                <table class="table align-middle">
-                    <thead class="text-muted small text-uppercase">
-                        <tr>
-                            <th>Product</th>
-                            <th class="text-center">Quantity</th>
-                            <th class="text-end">Subtotal</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for item in items %}
-                        <tr>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <img src="{{ url_for('static', filename='uploads/' + item.product.image_path) }}"
-                                         class="rounded me-3" style="width: 60px; height: 60px; object-fit: cover;">
-                                    <div>
-                                        <div class="fw-bold">{{ item.product.name }}</div>
-                                        <div class="text-muted small">{{ item.product.category }}</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="text-center fw-bold">{{ item.quantity }}</td>
-                            <td class="text-end fw-bold">${{ "%.2f"|format(item.subtotal) }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                    {% for item in items %}
+                    <div class="product-row d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center">
+                            <img src="{{ url_for('static', filename='uploads/' + (item.product.image_path or 'default.jpg')) }}"
+                                 class="img-thumb me-4 shadow-sm">
+                            <div>
+                                <h5 class="fw-bold mb-1">{{ item.product.name }}</h5>
+                                <p class="text-muted small mb-0">{{ item.product.category }}</p>
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <div class="fw-bold text-dark h5 mb-0">${{ "%.2f"|format(item.subtotal) }}</div>
+                            <div class="text-muted extra-small text-uppercase fw-bold">Qty: {{ item.quantity }}</div>
+                        </div>
+                    </div>
+                    {% endfor %}
                 {% else %}
-                <div class="text-center py-5">
-                    <p class="text-muted">Your bag is empty.</p>
-                </div>
+                    <div class="text-center py-5">
+                        <i class="bi bi-bag-x display-1 text-light mb-4 d-block"></i>
+                        <h4 class="fw-bold text-muted">Your bag is currently empty</h4>
+                        <a href="{{ url_for('storefront') }}" class="btn btn-dark rounded-pill px-5 mt-3">Start Shopping</a>
+                    </div>
                 {% endif %}
             </div>
         </div>
 
-        <div class="col-lg-4">
-            <div class="card border-0 shadow-sm p-4 bg-light" style="border-radius: 20px;">
-                <h4 class="fw-bold mb-4">Summary</h4>
+        <div class="col-lg-5">
+            <div class="card summary-card shadow-lg p-4 p-md-5">
+                <h3 class="fw-bold mb-4">Summary</h3>
 
                 <form action="{{ url_for('checkout') }}" method="POST">
                     <div class="mb-4">
-                        <label class="form-label small fw-bold text-muted text-uppercase">Customer Name</label>
-                        <input type="text" name="customer_name" class="form-control border-0 shadow-sm py-2"
-                               placeholder="e.g. John Doe" required>
+                        <label class="small fw-bold text-uppercase mb-2 d-block" style="color: rgba(255,255,255,0.5);">Recipient Name</label>
+                        <input type="text" name="customer_name" class="form-control checkout-input"
+                               placeholder="Full Name" required>
                     </div>
 
-                    <div class="d-flex justify-content-between mb-2">
-                        <span>Subtotal</span>
-                        <span>${{ "%.2f"|format(total) }}</span>
-                    </div>
-                    <div class="d-flex justify-content-between mb-4">
-                        <span>Shipping</span>
-                        <span class="text-success fw-bold">FREE</span>
-                    </div>
-                    <hr>
-                    <div class="d-flex justify-content-between mb-4">
-                        <span class="h5 fw-bold">Total</span>
-                        <span class="h4 fw-bold text-primary">${{ "%.2f"|format(total) }}</span>
+                    <div class="d-flex justify-content-between mb-3 border-bottom border-secondary border-opacity-25 pb-3">
+                        <span class="text-secondary">Subtotal</span>
+                        <span class="fw-bold">${{ "%.2f"|format(total) }}</span>
                     </div>
 
-                    <button type="submit" class="btn btn-dark w-100 py-3 fw-bold shadow-sm {{ 'disabled' if not items }}">
+                    <div class="d-flex justify-content-between mb-4">
+                        <span class="text-secondary">Shipping</span>
+                        <span class="text-success fw-bold">COMPLIMENTARY</span>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mb-5">
+                        <span class="h4 fw-bold mb-0">Total</span>
+                        <span class="h2 fw-900 mb-0" style="color: #ffffff;">$ {{ "%.2f"|format(total) }}</span>
+                    </div>
+
+                    <button type="submit" class="btn btn-light w-100 btn-checkout shadow {{ 'disabled' if not items }}">
                         Complete Purchase
                     </button>
+                    <p class="text-center extra-small mt-3 mb-0" style="color: rgba(255,255,255,0.3);">
+                        Secure Checkout Powered by Abhaya AI
+                    </p>
                 </form>
             </div>
         </div>
