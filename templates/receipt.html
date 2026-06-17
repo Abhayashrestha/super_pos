@@ -89,7 +89,7 @@
                 </div>
                 <div class="text-end">
                     <p class="text-muted small fw-bold mb-0">DATE</p>
-                    <h5 class="fw-bold text-dark">{{ sale.created_at.strftime('%d %b %Y') }}</h5>
+                    <h5 class="fw-bold text-dark">{{ sale.time.strftime('%d %b %Y') if sale.time else 'N/A' }}</h5>
                 </div>
             </div>
 
