@@ -4,7 +4,7 @@ def get_connection():
     creds={"host":"localhost",
            "database":"posdb",
            "user":"postgres",
-           "password":"Shrestha#$1"}
+           "password":"$1"}
 
     try:
         connection=psycopg2.connect(**creds)
@@ -302,18 +302,18 @@ print(get_dashboard_data(connect))
 
 def get_data(connection):
     out=[]
-    sql=""""
+    sql="""
         SELECT 
         p.product_id,
         p.name,
         p.price,
         date_trunc('hour', s.created_at) AS sale_hour,
-        COUNT(s.sale_id) AS units_sold,
-        (SELECT COUNT(*) FROM missed_sales m 
+        SUM(si.quantity) AS units_sold,
+        (SELECT SUM(requested_quantity) FROM missed_sales m 
         WHERE m.product_id = p.product_id 
         AND date_trunc('hour', m.created_at) = date_trunc('hour', s.created_at)) AS units_missed
     FROM products p
-    JOIN sales_items si ON p.product_id = si.product_id
+    JOIN sales_item si ON p.product_id = si.product_id
     JOIN sales s ON si.sale_id = s.sale_id
     GROUP BY p.product_id, p.name, p.price, sale_hour
     ORDER BY sale_hour ASC, p.product_id;
@@ -323,7 +323,7 @@ def get_data(connection):
             cur.execute(sql)
             row=cur.fetchall()
             key=[desc[0] for desc in cur.description]
-            for r in row:
+            for row in row:
                 out.append(dict(zip(key,row)))
             return out
     except Exception as e:
