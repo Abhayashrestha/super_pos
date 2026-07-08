@@ -14,7 +14,6 @@ def get_connection():
     except (Exception,psycopg2.Error) as error:
         print(f"{error} has occurred")
 
-connect=get_connection()
 def db_add_product(connection,product):
     try:
         with connection.cursor() as cur:
@@ -298,8 +297,6 @@ def get_dashboard_data(connection):
 
 
 
-print(get_dashboard_data(connect))
-
 def get_data(connection):
     out=[]
     sql="""
@@ -313,7 +310,7 @@ def get_data(connection):
         WHERE m.product_id = p.product_id 
         AND date_trunc('hour', m.created_at) = date_trunc('hour', s.created_at)) AS units_missed
     FROM products p
-    JOIN sales_item si ON p.product_id = si.product_id
+    JOIN sale_item si ON p.product_id = si.product_id
     JOIN sales s ON si.sale_id = s.sale_id
     GROUP BY p.product_id, p.name, p.price, sale_hour
     ORDER BY sale_hour ASC, p.product_id;
