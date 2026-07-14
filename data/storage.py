@@ -114,7 +114,7 @@ def sales_processing(connection,basket,customer_name):
                 if not result:
                     raise ValueError("Product Not Found")
                 p_id,product_name,current_price,current_quantity,product_category=result
-                product_instance = Product(product_name, current_price, current_quantity, product_category, product_id)
+                product_instance = Product(product_name, current_price, current_quantity, product_category, p_id=product_id)
 
                 if current_quantity>=quantity:
                     cur.execute(stock_reduce_sql,(quantity,product_id,current_quantity))
@@ -158,7 +158,7 @@ def db_get_receipt(connection,sale_id):
                 new_receipt = Sale(s_id,name,time)
                 for item in out:
                     product_name,quantity,price,p_quantity,category,product_id=item[1],item[2],item[3],item[6],item[7],item[8]
-                    product_instance=Product(product_name,price,p_quantity,category,product_id)
+                    product_instance=Product(product_name,price,p_quantity,category,p_id=product_id)
                     new_line_item=LineItem(product_instance,quantity)
                     new_receipt.add_item(new_line_item)
                 return new_receipt
