@@ -58,12 +58,12 @@ def buy_product(p_id):
         quantity=request.form.get("quantity")
         try:
             qty=int(quantity)
-            sale=engine.purchase_processing({p_id:qty},cus_name)
-            if sale:
-                flash(f"Success! Order #{sale} placed.", "success")
-                return redirect(url_for('show_receipt', s_id=sale))
+            result=engine.purchase_processing({p_id:qty},cus_name)
+            if result["status"]=="success":
+                flash(f"Success! Order #{result} placed.", "success")
+                return redirect(url_for('show_receipt', s_id=result["s_id"]))
             else:
-                flash('Transaction failed. Please try again.')
+                flash(f'{result["message "]}|Transaction failed. Please try again.')
 
         except ValueError as e:
             flash(str(e), "warning")
