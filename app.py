@@ -60,7 +60,7 @@ def buy_product(p_id):
             qty=int(quantity)
             result=engine.purchase_processing({p_id:qty},cus_name)
             if result["status"]=="success":
-                flash(f"Success! Order #{result["s_id"]} placed.", "success")
+                flash(f"Success! Order #{result['s_id']} placed.", "success")
                 return redirect(url_for('show_receipt', s_id=result["s_id"]))
             else:
                 flash(f'{result["message"]}|Transaction failed. Please try again.')
