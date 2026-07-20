@@ -275,7 +275,7 @@ def get_dashboard_data(connection):
         cur.execute(worst_products_query)
         row=cur.fetchall()
         if row:
-            worst_sellers= [{'product':row[0],'sold':row[1]} for row in row]
+            worst_sellers= [{'product':r[0],'sold':r[1]} for r in row]
 
         cur.execute(unsold_products_query)
         row=cur.fetchall()
