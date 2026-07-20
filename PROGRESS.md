@@ -15,16 +15,16 @@ Live defects. Each is one commit. You write the fix; the "why" is here so you un
 - [x] **Day 1 — Fix table name in `get_data` (`storage.py`).** ✅ verified 2026-07-08
       `JOIN sales_item` → `sale_item`. Every other query uses `sale_item`. This one throws the instant the ML pipeline calls it.
 
-- [ ] **Day 2 — Fix `buy_product` in `app.py`.**
-      `purchase_processing` returns a dict `{"status","s_id"}`. Use `sale["status"] == "success"` and `s_id=sale["s_id"]` (match `checkout`). Fix the trailing `redirect(url_for('show_receipt'))` that passes no `s_id`.
+- [x] **Day 2 — Fix `buy_product` in `app.py`.** ✅ verified
+      Now branches on `result["status"] == "success"`, flashes `result['s_id']`, redirects with `s_id=result["s_id"]`, error path lands on storefront, dead trailing redirect removed.
 
-- [ ] **Day 2 — Fix `Product(...)` positional args.**
-      In `sales_processing` and `db_get_receipt`, the `product_id` is landing in the `image_path` slot. Signature: `(name, price, quantity, category, image_path, p_id)`. Pass by keyword or fix order.
+- [x] **Day 2 — Fix `Product(...)` positional args.** ✅ verified
+      `sales_processing` and `db_get_receipt` now pass `p_id=product_id` by keyword; `image_path` falls to default.
 
 - [ ] **Day 3 — Fix worst-sellers comprehension in `get_dashboard_data`.**
-      `[... for row in row]` shadows the outer variable. Rename the loop var. Verify best/worst/unsold all return correct shapes.
+      `[... for row in row]` shadows the outer variable. Rename the loop var. Verify best/worst/unsold all return correct shapes.  ⚠️ STILL OPEN
 
-- [ ] **Day 3 — Smoke test.** Run the app, place a sale via storefront AND via cart checkout, load receipt, load dashboard. Confirm no crashes. Commit.
+- [ ] **Day 3 — Smoke test.** Run the app, place a sale via storefront AND via cart checkout, load receipt, load dashboard. Confirm no crashes. Commit.  ⚠️ STILL OPEN
 
 **Milestone P0:** platform runs clean end-to-end with the bot simulator feeding it.
 
